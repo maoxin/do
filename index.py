@@ -34,68 +34,114 @@ class MainHandler(BaseHandler):
         self.redirect("/message_transfer")
 
 class RegisterHandler(BaseHandler):
+    @tornado.web.asynchronous
     @tornado.gen.engine
-    def do_find_one(self, name, password, col):
-        if col == 'user_and_password':
-            collection = self.db.users.user_and_password
-        else:
-            collection = self.db.users.user
-        
-        name_exist = yield motor.Op(
-            collection.find_one, {'name': name}
+    def do_find_one(self, email, phone, name, password):
+        email_exist = yield motor.Op(
+            self.db.users.contact.find_one, {'email': email}
         )
+        phone_exist = yield motor.Op(
+            self.db.users.contact.find_one, {'phone': phone}
+		)
         
-        if not name_exist:
-            user = {
-                'name': name,
+        if not email_exist and not phone_exist:
+            contact_with_password = {
+                'email': email,
+				'phone': phone,
+				'name': name,
                 'password': password,
             }
-            self.db.users.user_and_password.insert(user)
-            self.db.users.user.insert({
-                'name': name,
-            })
+			
+            contact = {
+				'email': email,
+				'phone': phone,
+				'name': name
+			}
             
+            self.db.users.contact_with_password.insert(contact_with_password)
+            self.db.users.contact.insert(contact)
+
             self.set_secure_cookie('name', name)
             self.set_secure_cookie('password', password)
-            
+            self.set_secure_cookie('email', email)
+            self.set_secure_cookie('phone', phone)
+
+            message = {"response": 'ok'}
+            message_json = json.dumps(message)
+            self.set_header('Content_Type', 'application/json')
+            self.write(message_json)
+
             self.redirect("/")
         
         else:
-            self.write('Account been registered!, Fresh Page to try again.')
-        
-        self.finish()
+            if email_exist:
+                message = {"response": 'Email Exists'}
+            elif phone_exist:
+                message = {"response": 'Phone Exists'}
+            else:
+                message = {"response": 'Something Wrong'}
+				
+            message_json = json.dumps(message)
+			
+            self.set_header('Content_Type', 'application/json')	
+            self.write(message_json)
+            self.finish()
     
     def get(self):
-        self.render('account.html', post_page='/register')
+        self.render('register.html', post_page='/register')
     
     @tornado.web.asynchronous
     def post(self):
+        email = self.get_argument('email')
+        phone = self.get_argument('phone')
         name = self.get_argument('name')
         password = self.get_argument('password')
-        
-        self.do_find_one(name, password, 'user')
-            
+
+        self.do_find_one(email, phone, name, password)
+    
         
         
 
 class LoginHandler(BaseHandler):
+    @tornado.web.asynchronous
     @tornado.gen.engine
-    def check(self, name, password):
+    def check(self, email_or_phone, password):
+        try:
+            int(email_or_phone)
+            check_item = 'phone'
+        
+        except ValueError:
+			if "@" in email_or_phone:
+				check_item = 'mail'
+			else:
+				message = {"response": "Please Input Email or Phone"}
+				message_json = json.dumps(message)
+				self.set_header("Content_Type", "application/json")
+				self.write(message_json)
+				self.redirect('/login')
+		
         document = yield motor.Op(
-            self.db.users.user_and_password.find_one, {'name': name}
+            self.db.users.contact_with_password.find_one, {check_item: email_or_phone}
         )
         
         if document and document['password'] == password:
+            email = document['email']
+            phone = document['phone']
             self.set_secure_cookie('name', name)
             self.set_secure_cookie('password', password)
-            
+            self.set_secure_cookie('email', email)
+            self.set_secure_cookie('phone', phone)
+
             self.redirect("/")
-        
+
         else:
-            self.write('Account not exists or password wrong!')
-            
-        self.finish()
-    
+            message = {"response", "%s doesn't exist." %check_item}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+
+            self.finish()
+
     def get(self):
         if self.current_user:
             self.redirect("/")
@@ -150,6 +196,7 @@ class MessageTransferHandler(BaseHandler):
         self.write("Message has been sent!")
         
 class GetMessageHandler(BaseHandler):
+    @tornado.web.asynchronous
     @tornado.gen.engine
     def do_find(self, name):
         cursor = self.db.resource.entries.find({'to_person': name})
@@ -183,6 +230,58 @@ class GetMessageHandler(BaseHandler):
     def post(self):
         name = self.get_argument('name')
         self.do_find(name)
+ 
+class CreateItemHandler(BaseHandler):        
+	def get(self):
+		self.render('create_item.html', post_page='/create_item_post')
+	
+class CreateItemPostHandler(BaseHandler):
+	def post(self):
+		item_name = self.get_argument('item_name')
+		number_of_people = self.get_argument('number_of_people')
+		# the people finally must be between a scale.
+		deadline = self.get_argument('deadline')
+		happen_time = self.get_argument('happen_time')
+		continue_time = self.get_argument('continue_time')
+		describe = self.get_argument('describe')
+		place = self.get_argument('place')
+		participators = [self.current_user,]
+		
+		item_info = {
+			'item_name': item_name,
+			'number_of_people': number_of_people,
+			'deadline': deadline,
+			'happen_time': happen_time,
+			'continue_time': continue_time,
+			'describe': describe,
+			'place': place,
+			'participators': participators,
+		}
+		
+		self.db.resource.items.insert(item_info)
+        
+class JoinItemHandler(BaseHandler):
+    def get(self):
+        self.render('join_item.html', post_page='/join_item_post')
+
+class JoinItemPostHandler(BaseHandler):
+    @tornado.web.asynchronous
+    @tornado.gen.engine
+    def do_push_update(self, participator, item_name):
+        document = yield motor.Op(
+            self.db.resource.items.update, {'item_name': item_name}, {'$push':{"participators": participator}}
+        )
+        
+        self.finish()
+    
+    
+    @tornado.web.asynchronous
+    def post(self):
+        participator = self.get_argument('participator')
+        item_name = self.get_argument('item_name')
+        self.do_push_update(participator, item_name)
+        
+        
         
         
 
@@ -190,8 +289,12 @@ application = tornado.web.Application([
 	(r'/', MainHandler),        # normal page, check wether a user logged.
     (r'/login', LoginHandler),  # login and check the the flush info.
     (r'/message_transfer', MessageTransferHandler), 
-    (r'/my_message', GetMessageHandler),
+    (r'/my_message', GetMessageHandler), 
     (r'/register', RegisterHandler),
+	(r'/create_item', CreateItemHandler),
+	(r'/create_item_post', CreateItemPostHandler),
+    (r'/join_item', JoinItemHandler),
+    (r'/join_item_post', JoinItemPostHandler),
     # used by users to transfer info to other people,
     # info will be stored in database and be sent to the aim person.
     
