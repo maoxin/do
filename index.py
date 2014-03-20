@@ -135,7 +135,7 @@ class LoginHandler(BaseHandler):
             self.redirect("/")
 
         else:
-            message = {"response", "%s doesn't exist." %check_item}
+            message = {"response": "%s doesn't exist." %check_item}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
