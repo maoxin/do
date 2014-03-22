@@ -47,6 +47,7 @@ class PostItemHandler(BaseHandler):
         continue_time = json_file['mission_continue']
         accept_num = json_file['mission_accept_num']
         up_email = json_file['mission_up_email']
+        tag = json_file['mission_tag']
         
         info = {
             'name': name,
@@ -58,7 +59,8 @@ class PostItemHandler(BaseHandler):
             'up_email': up_email,
             'attendee': [up_email],
             'create_time': datetime.now(),
-            'picture': None
+            'picture': None,
+            'tag': tag
         }
 
         self.client.resource.items.insert(info, callback=self.func)
@@ -67,7 +69,7 @@ class PostItemHandler(BaseHandler):
 class PostItemPicure(BaseHandler):
     def func(self, result, error):
         if not error:
-            print "sc"
+
             message = {"response": 'ok'}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
@@ -188,27 +190,61 @@ class JoinItemHandler(BaseHandler):
         
         
 class GetNewItemHandler(BaseHandler):
-    @tornado.web.asynchronous
-    def get(self):
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        document = collection.do_find({}, direction=-1, axis="_id", limit=10)
-        
-        if document:
+    def func(self, result, info):
+        if result:
             message = []
             
-            for i in document:
+            for i in result:
                 ms = {
                     'id': str(i['_id']),
                     'name': i['name'],
+                    'description': i['description'],
                     'begin_time': i['begin_time'],
-                    'continue_time': i['continue_time']
+                    'continue_time': i['continue_time'],
+                    'picture_path': i['picture'],
+                    'accept_num': i['accept_num'],
+                    'up_email': i['up_email'],
+                    'attendee': i['attendee'],
+                    'create_time': str(i['create_time']),
+                    'tag': i['tag']
                 }
                 
                 message.append(ms) 
                 
-            message_json = json.dumps(message)
+            message_json = json.dumps({'response': message})
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             
             self.finish()
             return
+            
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return
+    
+    @tornado.web.asynchronous
+    def get(self):
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+        document = collection.do_find({}, self.func, None, direction=-1, axis="_id", limit=10)
+        
+class GetMissionPictureHandler(BaseHandler):
+    def post(self):
+        json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
+        name = json_file['picture_path']
+        
+        picture = open(name, 'r').read()
+        self.set_header("Content_Type", "image/png")
+        self.write(picture)
+        
+        return
+        
+        
+        
+        
+        
+        
