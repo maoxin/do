@@ -52,11 +52,12 @@ class PostItemHandler(BaseHandler):
         
         place_name = json_file['mission_place_name']
         print json_file['mission_place']
-        lat = json_file['mission_place'][0]
-        lon = json_file['mission_place'][1]
+        lat = json_file['mission_place_latitude']
+        lon = json_file['mission_place_longitude']
         
         user_place_name = json_file['user_info_str']
-        user_geo = json_file['user_info_geo']
+        user_lat = json_file['user_info_geo_latitude']
+        user_lon = json_file['user_info_geo_longitude']
         
         begin_time = json_file['mission_begin_time']
         continue_time = json_file['mission_continue']
@@ -78,7 +79,8 @@ class PostItemHandler(BaseHandler):
             
             #
             'user_place_name': user_place_name,
-            'user_geo': user_geo,
+            'user_lat': user_lat,
+            'user_lon': user_lon,
             
             'begin_time': begin_time,
             'continue_time': continue_time,
@@ -247,7 +249,7 @@ class GetNewItemHandler(BaseHandler):
                     'lat': i['lat'],
                     'lon': i['lon'],
         
-                    'picture_path': i['picture'],
+                    'picture_path': i['picture_path'],
                     'create_time': str(i['create_time']),
 
                 }

@@ -91,7 +91,13 @@ class RegisterHandler(BaseHandler):
         password = json_file['password']
         
         password = info_encrypt.encrypt(password)
-        info = {'name': name, 'email': email, 'phone': phone, 'password': password}
+        info = {
+            'name': name, 
+            'email': email, 
+            'phone': phone, 
+            'password': password,
+            'create_time': str(datetime.now()),
+        }
         
         query_1 = {'email': email}
         query_2 = {'phone': phone}
