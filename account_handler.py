@@ -40,6 +40,9 @@ class LoginHandler(BaseHandler):
     def post(self):
         print "connected"
         print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+                    log.write('connected, ' + str(datetime.now()))
+        
         json_file = json.loads(self.get_argument('JSON_LOGIN'))
         tag = json_file['tag']
         info = json_file['info']
@@ -56,14 +59,14 @@ class LoginHandler(BaseHandler):
 class RegisterHandler(BaseHandler):
     """Response for request for regist"""
     def func(self, result, info):
-        if not result:
-            self.client.users.contact_with_password.insert(info)
-        
+        if not result:        
             message = {"response": "ok"}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'register succeed'
+            
+            self.client.users.contact_with_password.insert(info)
         
         else:
             message = {"response": "fail"}
@@ -77,6 +80,11 @@ class RegisterHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
+        print "register"
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+                    log.write('register, ' + str(datetime.now()))
+        
         json_file = json.loads(self.get_argument('JSON_SIGN'))
         name = json_file['name']
         email = json_file['email']

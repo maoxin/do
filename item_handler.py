@@ -39,28 +39,51 @@ class PostItemHandler(BaseHandler):
     def post(self):
         print "post item"
         print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('post item, ' + str(datetime.now()))
+        
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
+        up_email = json_file['mission_up_email']
+        
+        tag = json_file['mission_tag']
         name = json_file['mission_name']
         description = json_file['mission_description']
-        # place = json_file['mission_place']
+        
+        place_name = json_file['mission_place_name']
+        lat = json_file['mission_lat']
+        lon = json_file['mission_lon']
+        
         begin_time = json_file['mission_begin_time']
         continue_time = json_file['mission_continue']
+        
         accept_num = json_file['mission_accept_num']
-        up_email = json_file['mission_up_email']
-        tag = json_file['mission_tag']
+
         
         info = {
+            'up_email': up_email,
+
+            'tag': tag,
             'name': name,
             'description': description,
-            # 'place': place,
+            
+            #
+            'place_name': place,
+            'lat': lat,
+            'lon': lon,
+            
             'begin_time': begin_time,
             'continue_time': continue_time,
+            
             'accept_num': accept_num,
-            'up_email': up_email,
-            'attendee': [up_email],
-            'create_time': datetime.now(),
-            'picture': None,
-            'tag': tag
+            
+            #
+            'attendee': [],
+            # the uper himself maybe or not a member. need detail.
+            
+            'create_time': str(datetime.now()),
+            
+            #
+            'picture_path': None,
         }
 
         self.client.resource.items.insert(info, callback=self.func)
@@ -91,16 +114,19 @@ class PostItemPicure(BaseHandler):
     def post(self):
         print 'post picture'
         print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('post picture, ' + str(datetime.now()))
+        
         json_file = json.loads(self.get_argument('JSON_IMAGE'))
         name = json_file['mission_name']
         up_email = json_file['mission_up_email']
         picture = json_file['mission_picture']
+        
         pic_decode = base64.b64decode(picture)
         
         pic_path = './photo/' + up_email + '+' + name + '.png'
-        pc = open(pic_path, 'wb')
-        pc.write(pic_decode)
-        pc.close()
+        with open(pic_path, 'wb') as pc:
+            pc.write(pic_decode)
         
         query = {
             'name': name,
@@ -139,7 +165,7 @@ class JoinItemHandler(BaseHandler):
                 'item_id': info['item_id']
             }
             
-            self.client.resource.items.update(query, {'$push': {'join_email': info['join_email']}, 'accept_num': result['accept_num'] + 1}, callback=self.func_write)
+            self.client.resource.items.update(query, {'$push': {'join_email': info['join_email']}, 'accept_num': result['accept_num'] - 1}, callback=self.func_write)
         
         else:
             if not result:
@@ -196,17 +222,25 @@ class GetNewItemHandler(BaseHandler):
             
             for i in result:
                 ms = {
+                    'up_email': i['up_email'],
                     'id': str(i['_id']),
+
+                    'tag': i['tag'],
                     'name': i['name'],
                     'description': i['description'],
+                    'accept_num': i['accept_num'],
+                    'attendee': i['attendee'],
+                    
                     'begin_time': i['begin_time'],
                     'continue_time': i['continue_time'],
+                    
+                    'place_name': i['place_name'],
+                    'lat': i['lat'],
+                    'lon': i['lon'],
+        
                     'picture_path': i['picture'],
-                    'accept_num': i['accept_num'],
-                    'up_email': i['up_email'],
-                    'attendee': i['attendee'],
                     'create_time': str(i['create_time']),
-                    'tag': i['tag']
+
                 }
                 
                 message.append(ms) 
@@ -229,11 +263,21 @@ class GetNewItemHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def get(self):
+        print 'get new item'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('get new item, ' + str(datetime.now()))
+        
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
         document = collection.do_find({}, self.func, None, direction=-1, axis="_id", limit=10)
         
 class GetMissionPictureHandler(BaseHandler):
     def post(self):
+        print 'get picture'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('get picture, ' + str(datetime.now()))
+        
         json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
         name = json_file['picture_path']
         
