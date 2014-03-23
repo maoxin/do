@@ -2,3 +2,4 @@ photo
 .DS_Store
 *~
 summary
+*.pyc
