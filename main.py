@@ -5,7 +5,7 @@ import motor
 import account_handler
 import os
 import item_handler
-# import communication_handler
+import relation_handler
 
 client = motor.MotorClient().open_sync()
 # use the motor(http://motor.readthedocs.org) to operate mongodb in tornado.
@@ -30,6 +30,7 @@ application = tornado.web.Application([
     (r'/item/picture', item_handler.PostItemPicure),
     (r'/item/get_item', item_handler.GetNewItemHandler),
     (r'/item/get_mission_picture', item_handler.GetMissionPictureHandler),
+    (r'/relation/follow', relation_handler.FollowHandler),
     # post the latest items stored in mobile and get the new one.
     # (r'/item/talk_in_item', communication_handler.ItemTalkHandler),
     # (r'/item/get_talk_in_item', communication_handler.ItemGetTalkHandler),
