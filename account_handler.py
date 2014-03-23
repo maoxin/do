@@ -1,5 +1,4 @@
 import tornado.web
-import tornado.ioloop
 import db_handler
 import info_encrypt
 import json
@@ -41,7 +40,7 @@ class LoginHandler(BaseHandler):
         print "connected"
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-                    log.write('connected, ' + str(datetime.now()))
+                    log.write('connected, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_LOGIN'))
         tag = json_file['tag']
@@ -83,7 +82,7 @@ class RegisterHandler(BaseHandler):
         print "register"
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-                    log.write('register, ' + str(datetime.now()))
+                    log.write('register, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_SIGN'))
         name = json_file['name']
@@ -92,7 +91,13 @@ class RegisterHandler(BaseHandler):
         password = json_file['password']
         
         password = info_encrypt.encrypt(password)
-        info = {'name': name, 'email': email, 'phone': phone, 'password': password}
+        info = {
+            'name': name, 
+            'email': email, 
+            'phone': phone, 
+            'password': password,
+            'create_time': str(datetime.now()),
+        }
         
         query_1 = {'email': email}
         query_2 = {'phone': phone}

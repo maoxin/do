@@ -1,5 +1,4 @@
 import tornado.web
-import tornado.ioloop
 import db_handler
 from bson.objectid import ObjectId
 import info_encrypt
@@ -40,7 +39,7 @@ class PostItemHandler(BaseHandler):
         print "post item"
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-            log.write('post item, ' + str(datetime.now()))
+            log.write('post item, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
         up_email = json_file['mission_up_email']
@@ -50,8 +49,12 @@ class PostItemHandler(BaseHandler):
         description = json_file['mission_description']
         
         place_name = json_file['mission_place_name']
-        lat = json_file['mission_lat']
-        lon = json_file['mission_lon']
+        lat = json_file['mission_place_latitude']
+        lon = json_file['mission_place_longitude']
+        
+        user_place_name = json_file['user_info_str']
+        user_lat = json_file['user_info_geo_latitude']
+        user_lon = json_file['user_info_geo_longitude']
         
         begin_time = json_file['mission_begin_time']
         continue_time = json_file['mission_continue']
@@ -67,9 +70,14 @@ class PostItemHandler(BaseHandler):
             'description': description,
             
             #
-            'place_name': place,
+            'place_name': place_name,
             'lat': lat,
             'lon': lon,
+            
+            #
+            'user_place_name': user_place_name,
+            'user_lat': user_lat,
+            'user_lon': user_lon,
             
             'begin_time': begin_time,
             'continue_time': continue_time,
@@ -115,7 +123,7 @@ class PostItemPicure(BaseHandler):
         print 'post picture'
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-            log.write('post picture, ' + str(datetime.now()))
+            log.write('post picture, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_IMAGE'))
         name = json_file['mission_name']
@@ -238,7 +246,7 @@ class GetNewItemHandler(BaseHandler):
                     'lat': i['lat'],
                     'lon': i['lon'],
         
-                    'picture_path': i['picture'],
+                    'picture_path': i['picture_path'],
                     'create_time': str(i['create_time']),
 
                 }
@@ -266,7 +274,7 @@ class GetNewItemHandler(BaseHandler):
         print 'get new item'
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-            log.write('get new item, ' + str(datetime.now()))
+            log.write('get new item, ' + str(datetime.now()) + '\n')
         
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
         document = collection.do_find({}, self.func, None, direction=-1, axis="_id", limit=10)
@@ -276,7 +284,7 @@ class GetMissionPictureHandler(BaseHandler):
         print 'get picture'
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-            log.write('get picture, ' + str(datetime.now()))
+            log.write('get picture, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
         name = json_file['picture_path']
