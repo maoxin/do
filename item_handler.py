@@ -43,6 +43,7 @@ class PostItemHandler(BaseHandler):
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
         print self.get_argument('JSON_ITEM_CREATE')
+        print json_file
         up_email = json_file['mission_up_email']
         
         tag = json_file['mission_tag']
