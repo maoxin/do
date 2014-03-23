@@ -88,7 +88,7 @@ class PostItemHandler(BaseHandler):
             'attendee': [],
             # the uper himself maybe or not a member. need detail.
             
-            'create_time': str(datetime.now()) + '\n',
+            'create_time': str(datetime.now()),
             
             #
             'picture_path': None,
