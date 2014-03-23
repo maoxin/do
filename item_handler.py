@@ -70,7 +70,7 @@ class PostItemHandler(BaseHandler):
             'description': description,
             
             #
-            'place_name': place,
+            'place_name': place_name,
             'lat': lat,
             'lon': lon,
             
