@@ -56,8 +56,7 @@ class PostItemHandler(BaseHandler):
         lon = json_file['mission_place'][1]
         
         user_place_name = json_file['user_info_str']
-        user_lat = json_file['user_info_geo'][0]
-        user_lon = json_file['user_info_geo'][1]
+        user_geo = json_file['user_info_geo']
         
         begin_time = json_file['mission_begin_time']
         continue_time = json_file['mission_continue']
@@ -79,8 +78,7 @@ class PostItemHandler(BaseHandler):
             
             #
             'user_place_name': user_place_name,
-            'user_lat': user_lat,
-            'user_lon': user_lon,
+            'user_geo': user_geo,
             
             'begin_time': begin_time,
             'continue_time': continue_time,
