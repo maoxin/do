@@ -42,6 +42,7 @@ class PostItemHandler(BaseHandler):
             log.write('post item, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
+        print self.get_argument('JSON_ITEM_CREATE')
         up_email = json_file['mission_up_email']
         
         tag = json_file['mission_tag']
@@ -126,7 +127,6 @@ class PostItemPicure(BaseHandler):
         with open('./log/logfile.txt', 'a') as log:
             log.write('post picture, ' + str(datetime.now()) + '\n')
         
-        print self.get_argument('JSON_IMAGE')
         json_file = json.loads(self.get_argument('JSON_IMAGE'))
         name = json_file['mission_name']
         up_email = json_file['mission_up_email']
