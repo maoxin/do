@@ -49,6 +49,7 @@ class PostItemHandler(BaseHandler):
         description = json_file['mission_description']
         
         place_name = json_file['mission_place_name']
+        print json_file['mission_place']
         lat = json_file['mission_place'][0]
         lon = json_file['mission_place'][1]
         
