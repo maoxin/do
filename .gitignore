@@ -3,3 +3,5 @@ photo
 *~
 summary
 *.pyc
+log
+nohup.out

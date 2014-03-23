@@ -42,8 +42,6 @@ class PostItemHandler(BaseHandler):
             log.write('post item, ' + str(datetime.now()) + '\n')
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
-        print self.get_argument('JSON_ITEM_CREATE')
-        print json_file
         up_email = json_file['mission_up_email']
         
         tag = json_file['mission_tag']
@@ -51,7 +49,6 @@ class PostItemHandler(BaseHandler):
         description = json_file['mission_description']
         
         place_name = json_file['mission_place_name']
-        print json_file['mission_place']
         lat = json_file['mission_place_latitude']
         lon = json_file['mission_place_longitude']
         
