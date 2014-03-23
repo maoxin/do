@@ -126,6 +126,7 @@ class PostItemPicure(BaseHandler):
         with open('./log/logfile.txt', 'a') as log:
             log.write('post picture, ' + str(datetime.now()) + '\n')
         
+        print self.get_argument('JSON_IMAGE')
         json_file = json.loads(self.get_argument('JSON_IMAGE'))
         name = json_file['mission_name']
         up_email = json_file['mission_up_email']
