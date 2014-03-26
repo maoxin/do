@@ -44,7 +44,7 @@ class PostItemHandler(BaseHandler):
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
         up_email = json_file['mission_up_email']
-        up_name = json_file['up_name']
+        up_name = json_file['mission_up_name']
         
         tag = json_file['mission_tag']
         name = json_file['mission_name']
@@ -235,7 +235,7 @@ class GetNewItemHandler(BaseHandler):
             items_info = []
             for item in items:
                 info = {
-                    'id': item['_id'],
+                    'id': str(item['_id']),
                     'up_email': item['up_email'],
                     'up_name': item['up_name'],
         
@@ -283,13 +283,18 @@ class GetNewItemHandler(BaseHandler):
             log.write('get_new_item, ' + str(datetime.now()) + '\n')
             
         json_file = json.loads(self.get_argument('JSON_NEW_ITEM'))
-        ids = get_str_list(json_file['ids'])
+
+        # ids = get_str_list(json_file['ids'])
+        ids = json_file['ids']
         ids = [ObjectId(x) for x in ids]
         
-        latest_id = max(ids)
+        if not ids:
+            info = 0
+        else:
+            info = max(ids)
         
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        collection.do_find({}, self.func, latest_id, direction=-1, axis="_id", limit=150)
+        collection.do_find({}, self.func, info, direction=-1, axis="_id", limit=15)
         
         
 
