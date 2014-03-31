@@ -317,7 +317,46 @@ class GetMissionPictureHandler(BaseHandler):
         return
         
 
-        
-        
+class RecieveItemHandler(BaseHandler):
+    
+    def func(self, result, info):
+        if result:
+            item_info = {
+                'id': str(result['_id']),
+                'up_email': result['up_email'],
+                'up_name': result['up_name'],
+    
+                'tag': result['tag'],     
+                'name': result['name'],
+                'description': result['description'],
+
+                'place_name': result['place_name'],
+                'lat': result['lat'],
+                'lon': result['lon'],
+
+                'begin_time': result['begin_time'],
+                'continue_time': result['continue_time'],
+                'accept_num': result['accept_num'],
+
+                'attendee': result['attendee'],
+
+                'picture_path': result['picture_path'],
+            }
+
+    @tornado.web.asynchronous
+    def post(self):
+        json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
+        item_id = json_file['mission_id']
+
+        query = {
+         'item_id': ObjectId(item_id),
+        }
+
+        info = {}
+
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+
+        document = collection.do_find_one(query, func, info)     
+
         
         
