@@ -345,6 +345,11 @@ class RecieveItemHandler(BaseHandler):
 
     @tornado.web.asynchronous
     def post(self):
+        print 'recieve_item'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('recieve_item, ' + str(datetime.now()) + '\n')
+            
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         item_id = json_file['mission_id']
 
