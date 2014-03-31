@@ -322,6 +322,7 @@ class RecieveItemHandler(BaseHandler):
     def func(self, result, info):
         if result:
             item_info = {
+                'response': 'ok',
                 'id': str(result['_id']),
                 'up_email': result['up_email'],
                 'up_name': result['up_name'],
