@@ -223,7 +223,7 @@ class JoinItemHandler(BaseHandler):
         
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
         
-        document = collection.do_find_one(query, func, info)
+        document = collection.do_find_one(query, self.func, info)
         
         
 class GetNewItemHandler(BaseHandler):
