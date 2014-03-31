@@ -14,7 +14,7 @@ class LoginHandler(BaseHandler):
     """Response for request for login"""
     def func(self, result, info):
         if result and info_encrypt.match(result['password'], info['password']):
-            message = {"response": "ok"}
+            message = {"response": "ok", 'email': result['email'], 'phone': result['phone'], 'name': result['name']}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
