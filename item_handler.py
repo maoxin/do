@@ -231,7 +231,7 @@ class GetNewItemHandler(BaseHandler):
         if result:
             latest_id = info
             
-            items = filter(lambda x: x > latest_id, result)
+            items = filter(lambda x: x['_id'] > latest_id, result)
             items_info = []
             for item in items:
                 info = {
@@ -284,11 +284,12 @@ class GetNewItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_NEW_ITEM'))
 
-        # ids = get_str_list(json_file['ids'])
+        # ids = get_str_list(json_file['ids'][0])
         ids = json_file['ids']
+        print ids
         ids = [ObjectId(x) for x in ids]
         
-        if not ids:
+        if not ids or not ids[0]:
             info = 0
         else:
             info = max(ids)
@@ -307,9 +308,10 @@ class GetMissionPictureHandler(BaseHandler):
         
         json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
         name = json_file['picture_path']
-        
+        print name
+
         picture = open(name, 'r').read()
-        self.set_header("Content_Type", "image/png")
+        self.set_header("Content-Type", "image/png; charset=utf-8")
         self.write(picture)
         
         return
