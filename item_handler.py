@@ -342,6 +342,22 @@ class RecieveItemHandler(BaseHandler):
 
                 'picture_path': result['picture_path'],
             }
+            
+            message_json = json.dumps({'response': item_info})
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+        
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return
 
     @tornado.web.asynchronous
     def post(self):
