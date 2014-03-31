@@ -368,6 +368,8 @@ class RecieveItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         item_id = json_file['mission_id']
+        
+        print item_id
 
         query = {
          'item_id': ObjectId(item_id),
