@@ -146,7 +146,7 @@ class PostItemPicure(BaseHandler):
         
         print query
         
-        self.client.resource.items.update(query, {"$set": {'picture': pic_path} }, callback=self.func)
+        self.client.resource.items.update(query, {"$set": {'picture_path': pic_path} }, callback=self.func)
 
 
 class JoinItemHandler(BaseHandler):
