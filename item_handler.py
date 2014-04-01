@@ -86,7 +86,7 @@ class PostItemHandler(BaseHandler):
             'begin_time': begin_time,
             'continue_time': continue_time,
             
-            'accept_num': accept_num,
+            'accept_num': int(accept_num),
             
             #
             'attendee': [],
@@ -282,8 +282,8 @@ class RecieveItemHandler(BaseHandler):
             return
     
     def func(self, result, info):
-        if result and len(result['attendee']) < result['accept_num']:
-            print len(result['attendee'])
+        if result and (len(result['attendee']) < int(result['accept_num'])):
+            print len(result['attendee']), result['accept_num']
             self.info = result
             
             query = {
@@ -302,7 +302,7 @@ class RecieveItemHandler(BaseHandler):
                 self.finish()
                 return
            
-            elif len(result['attendee']) >= result['accept_num']:
+            elif len(result['attendee']) >= int(result['accept_num']):
                 message = {"response": "attendee full"}
                 message_json = json.dumps(message)
                 self.set_header("Content_Type", "application/json")
