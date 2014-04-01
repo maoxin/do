@@ -243,7 +243,7 @@ class GetMissionPictureHandler(BaseHandler):
 
 class RecieveItemHandler(BaseHandler):
     
-    def func_write(self.result, info):
+    def func_write(self, result, info):
         if result:
             item_info = {
                 'response': 'ok',
