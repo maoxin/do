@@ -248,7 +248,7 @@ class RecieveItemHandler(BaseHandler):
             find_attendee = FindInfo()
             item_info = {
                 'response': 'ok',
-                'attendee': find_attendee({'_id': self.id, 'attendee'}),
+                'attendee': find_attendee({'_id': self.id}, 'attendee'),
             }
             
             message_json = json.dumps(item_info)
