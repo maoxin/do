@@ -319,29 +319,11 @@ class GetMissionPictureHandler(BaseHandler):
 
 class RecieveItemHandler(BaseHandler):
     
-    def func(self, result, info):
-        if result:
+    def func_write(self, result, error):
+        if not error:
             item_info = {
                 'response': 'ok',
-                'id': str(result['_id']),
-                'up_email': result['up_email'],
-                'up_name': result['up_name'],
-    
-                'tag': result['tag'],     
-                'name': result['name'],
-                'description': result['description'],
-
-                'place_name': result['place_name'],
-                'lat': result['lat'],
-                'lon': result['lon'],
-
-                'begin_time': result['begin_time'],
-                'continue_time': result['continue_time'],
-                'accept_num': result['accept_num'],
-
                 'attendee': result['attendee'],
-
-                'picture_path': result['picture_path'],
             }
             
             message_json = json.dumps(item_info)
@@ -350,15 +332,52 @@ class RecieveItemHandler(BaseHandler):
             
             self.finish()
             return
-        
+            
         else:
-            message = {"response": "fail"}
+            print error
+            message = {"response": error}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
-        
+            
             self.finish()
             return
+    
+    def func(self, result, info):
+        if result and len(result['attendee']) < result['accept_num']:
+            query = {
+                '_id': info['_id']
+            }
+            
+            self.client.resource.items.update(query, {'$push': {'attendee': info['join_email']}}, callback=self.func_write)
+        
+        else:
+            if not result:
+                message = {"response": "item not found"}
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+            
+                self.finish()
+                return
+           
+            elif len(result['attendee']) >= result['accept_num']:
+                message = {"response": "attendee full"}
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+            
+                self.finish()
+                return
+                
+            else:
+                message = {"response": "fail"}
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+            
+                self.finish()
+                return
 
     @tornado.web.asynchronous
     def post(self):
@@ -369,12 +388,13 @@ class RecieveItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         item_id = json_file['mission_id']
+        join_email = json_file['join_email']
 
         query = {
          '_id': ObjectId(item_id),
         }
 
-        info = {}
+        info = {'_id': query['_id'], 'join_email': join_email}
 
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
 
