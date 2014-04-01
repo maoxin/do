@@ -334,7 +334,7 @@ class RecieveItemHandler(BaseHandler):
          '_id': ObjectId(item_id),
         }
 
-        info = {'_id': query['_id'], 'join_email': join_email}
+        info = {'_id': self.query['_id'], 'join_email': join_email}
 
         self.collection = db_handler.DBHandler(self.client, 'resource', 'items')
 
