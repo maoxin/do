@@ -243,18 +243,17 @@ class GetMissionPictureHandler(BaseHandler):
 
 class RecieveItemHandler(BaseHandler):
     
-    def func_write(self, result, error):
-        if not error:
-            find_attendee = FindInfo()
+    def func_write(result, info):
+        if result:
             item_info = {
                 'response': 'ok',
-                'attendee': find_attendee({'_id': self.id}, 'attendee'),
+                'attendee': result['attendee']
             }
-            
+        
             message_json = json.dumps(item_info)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
-            
+        
             self.finish()
             return
             
@@ -268,13 +267,29 @@ class RecieveItemHandler(BaseHandler):
             self.finish()
             return
     
+    def func_after_update(self, result, error):
+        if not error:
+            self.collection.do_find_one(self.query, self.func_write, {})
+            
+        else:
+            print error
+            message = {"response": error}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+    
     def func(self, result, info):
         if result and len(result['attendee']) < result['accept_num']:
+            self.info = result
+            
             query = {
                 '_id': info['_id']
             }
             
-            self.client.resource.items.update(query, {'$push': {'attendee': info['join_email']}}, callback=self.func_write)
+            self.client.resource.items.update(query, {'$push': {'attendee': info['join_email']}}, callback=self.func_after_update)
         
         else:
             if not result:
@@ -315,31 +330,16 @@ class RecieveItemHandler(BaseHandler):
         item_id = json_file['mission_id']
         join_email = json_file['join_email']
 
-        query = {
+        self.query = {
          '_id': ObjectId(item_id),
         }
-        
-        self.id = query['_id']
 
         info = {'_id': query['_id'], 'join_email': join_email}
 
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+        self.collection = db_handler.DBHandler(self.client, 'resource', 'items')
 
-        document = collection.do_find_one(query, self.func, info)     
+        document = self.collection.do_find_one(self.query, self.func, info)     
 
-class FindInfo(BaseHandler):
-    def func(self, result, info):
-        if result:
-            return result[info]
-            
-            self.finish()
-    
-    
-    @tornado.web.asynchronous
-    def find(self, query, info_name):
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        
-        document = collection.do_find_one(query, self.func, info)
     
     
     
