@@ -283,6 +283,7 @@ class RecieveItemHandler(BaseHandler):
     
     def func(self, result, info):
         if result and len(result['attendee']) < result['accept_num']:
+            print len(result['attendee'])
             self.info = result
             
             query = {
