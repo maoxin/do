@@ -245,9 +245,10 @@ class RecieveItemHandler(BaseHandler):
     
     def func_write(self, result, error):
         if not error:
+            find_attendee = FindInfo()
             item_info = {
                 'response': 'ok',
-                'attendee': result['attendee'],
+                'attendee': find_attendee({'_id': self.id, 'attendee'}),
             }
             
             message_json = json.dumps(item_info)
@@ -317,6 +318,8 @@ class RecieveItemHandler(BaseHandler):
         query = {
          '_id': ObjectId(item_id),
         }
+        
+        self.id = query['_id']
 
         info = {'_id': query['_id'], 'join_email': join_email}
 
@@ -324,5 +327,19 @@ class RecieveItemHandler(BaseHandler):
 
         document = collection.do_find_one(query, self.func, info)     
 
+class FindInfo(BaseHandler):
+    def func(self, result, info):
+        if result:
+            return result[info]
+            
+            self.finish()
+    
+    
+    @tornado.web.asynchronous
+    def find(self, query, info_name):
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
         
-        
+        document = collection.do_find_one(query, self.func, info)
+    
+    
+    
