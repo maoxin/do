@@ -13,7 +13,8 @@ class DBHandler(object):
         result = yield motor.Op(
             self.cl.find_one, pairs
         )
-        print info
+        print 'query', pairs
+        print 'info', info
         func(result, info)
         
     @tornado.gen.engine

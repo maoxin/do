@@ -344,7 +344,7 @@ class RecieveItemHandler(BaseHandler):
                 'picture_path': result['picture_path'],
             }
             
-            message_json = json.dumps({'response': item_info})
+            message_json = json.dumps(item_info)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             
@@ -369,8 +369,6 @@ class RecieveItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         item_id = json_file['mission_id']
-        
-        print item_id
 
         query = {
          '_id': ObjectId(item_id),
