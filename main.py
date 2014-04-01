@@ -26,7 +26,6 @@ application = tornado.web.Application([
     (r'/login', account_handler.LoginHandler),
     (r'/register', account_handler.RegisterHandler),
     (r'/item/post_item', item_handler.PostItemHandler),
-    # (r'/item/join_item', item_handler.JoinItemHandler),
     (r'/item/picture', item_handler.PostItemPicure),
     (r'/item/get_new_item', item_handler.GetNewItemHandler),
     (r'/item/receive', item_handler.RecieveItemHandler),
