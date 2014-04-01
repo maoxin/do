@@ -373,7 +373,7 @@ class RecieveItemHandler(BaseHandler):
         print item_id
 
         query = {
-         'item_id': ObjectId(item_id),
+         '_id': ObjectId(item_id),
         }
 
         info = {}
