@@ -156,7 +156,7 @@ class GetNewItemHandler(BaseHandler):
             delete_ids = [str(x['delete_time_id']) for x in result]
             self.items_info['delete'] = delete_ids
          
-        message_json = json.dumps({'response': items_info})
+        message_json = json.dumps({'response': self.items_info})
         self.set_header("Content_Type", "application/json")
         self.write(message_json)
 
