@@ -151,12 +151,26 @@ class PostItemPicure(BaseHandler):
         
         
 class GetNewItemHandler(BaseHandler):
-    def func(self, result, info):
+    def func_delete_items(self, result, info):
+        if result:
+            delete_ids = [str(x['delete_time_id']) for x in result]
+            self.items_info['delete'] = delete_ids
+         
+        message_json = json.dumps({'response': items_info})
+        self.set_header("Content_Type", "application/json")
+        self.write(message_json)
+
+        self.finish()
+        return   
+
+    
+    
+    def func_new_item(self, result, info):
         if result:
             latest_id = info
             
             items = filter(lambda x: x['_id'] > latest_id, result)
-            items_info = []
+            self.items_info = []
             for item in items:
                 info = {
                     'id': str(item['_id']),
@@ -180,14 +194,18 @@ class GetNewItemHandler(BaseHandler):
                     'picture_path': item['picture_path'],
                 }
                 
-                items_info.append(info)
+                self.items_info.append(info)
             
-            message_json = json.dumps({'response': items_info})
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            query = {
+                '_id': {
+                    '$in': self.ids
+                }
+            }
             
-            self.finish()
-            return
+            info = {}    
+            
+            collection = db_handler.DBHandler(self.client, 'resource', 'items')
+            collection.do_find(query, self.func_delete_items, info, direction=-1, axis="_id", limit=15)
             
         else:
             message = {"response": "fail"}
@@ -212,6 +230,7 @@ class GetNewItemHandler(BaseHandler):
         ids = list(np.unique(json_file['ids']))
         print ids
         ids = [ObjectId(x) for x in ids]
+        self.ids = ids
         
         if not ids or not ids[0]:
             info = 0
@@ -219,7 +238,7 @@ class GetNewItemHandler(BaseHandler):
             info = max(ids)
         
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        collection.do_find({}, self.func, info, direction=-1, axis="_id", limit=15)
+        collection.do_find({}, self.func_new_item, info, direction=-1, axis="_id", limit=15)
         
         
 
