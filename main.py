@@ -30,6 +30,7 @@ application = tornado.web.Application([
     (r'/item/get_new_item', item_handler.GetNewItemHandler),
     (r'/item/receive', item_handler.RecieveItemHandler),
     (r'/item/get_mission_picture', item_handler.GetMissionPictureHandler),
+    (r'/item/delete', item_handler.DeleteItemHandler),
     (r'/relation/follow', relation_handler.FollowHandler),
     # post the latest items stored in mobile and get the new one.
     # (r'/item/talk_in_item', communication_handler.ItemTalkHandler),
