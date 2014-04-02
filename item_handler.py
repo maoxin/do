@@ -247,7 +247,8 @@ class RecieveItemHandler(BaseHandler):
         if result:
             item_info = {
                 'response': 'ok',
-                'attendee': result['attendee']
+                'attendee': result['attendee'],
+                'id': str(result['_id'])
             }
         
             message_json = json.dumps(item_info)
