@@ -204,7 +204,7 @@ class GetNewItemHandler(BaseHandler):
             
             info = {}    
             
-            collection = db_handler.DBHandler(self.client, 'resource', 'items')
+            collection = db_handler.DBHandler(self.client, 'resource', 'delete_items')
             collection.do_find(query, self.func_delete_items, info, direction=-1, axis="_id", limit=15)
             
         else:
