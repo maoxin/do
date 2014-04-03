@@ -422,6 +422,7 @@ class DeleteItemHandler(BaseHandler):
             log.write('delete_item, ' + str(datetime.now()) + '\n')
             
         json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
+        print json_file
         item_id = json_file['mission_id']
         up_email = json_file['mission_up_email']
         
