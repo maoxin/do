@@ -422,7 +422,6 @@ class DeleteItemHandler(BaseHandler):
             log.write('delete_item, ' + str(datetime.now()) + '\n')
             
         json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
-        print json_file
         item_id = json_file['mission_id']
         up_email = json_file['mission_up_email']
         
@@ -435,3 +434,90 @@ class DeleteItemHandler(BaseHandler):
         
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
         document = collection.do_find_one(self.query, self.func_insert, info)
+
+
+class ArchiveItemHandler(BaseHandler):
+    def func_write(self, result, error):
+        if not error:
+
+            message = {"response": 'ok', 'id': str(self.query['_id'])}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+            
+        else:
+            message = {"response": error}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+            
+        
+    def func_delete(self, result, error):
+        if not error:
+            self.client.resource.items.remove(self.query, callback=self.func_write)
+        else:
+            message = {'response': error}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+    
+    def func_insert(self, result, info):
+        if result:
+            result['archive_time_id'] = result['_id']
+            result.pop('_id')
+            
+            self.client.resource.archive_items.insert(result, callback=self.func_delete)
+        
+        else:
+            message = {'response': 'fail'}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+        
+    
+    @tornado.web.asynchronous
+    def post(self):
+        print 'archive_item'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('archive_item, ' + str(datetime.now()) + '\n')
+            
+        json_file = json.loads(self.get_argument('JSON_ARCHIVE_ITEM'))
+        item_id = json_file['mission_id']
+        up_email = json_file['mission_up_email']
+        
+        self.query = {
+            '_id': ObjectId(item_id),
+            'up_email': up_email,
+        }
+        
+        info = {}
+        
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+        document = collection.do_find_one(self.query, self.func_insert, info)
+
+class ItemTalkHandler(BaseHandler):
+    def post(self):
+        print 'talk_in_item'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('archive_item, ' + str(datetime.now()) + '\n')
+            
+        json_file = json.loads(self.get_argument('JSON_ITEM_TALK'))
+        item_id = json_file['mission_id']
+        talking_email = json_file('talking_email')
+        talking_content = json_file('talking_content')
+        
+        
