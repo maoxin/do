@@ -155,14 +155,17 @@ class GetNewItemHandler(BaseHandler):
         if result:
             delete_ids = [str(x['delete_time_id']) for x in result]
             self.items_info['delete'] = delete_ids
+        
+        else:
+            pass
          
         message_json = json.dumps({'response': self.items_info})
         self.set_header("Content_Type", "application/json")
         self.write(message_json)
 
         self.finish()
-        return   
-
+        return
+        
     
     
     def func_new_item(self, result, info):
@@ -550,6 +553,46 @@ class ItemTalkHandler(BaseHandler):
         self.client.resource.talks.insert(info, callback=self.after_insert_func)
         
 class ItemGetTalkHandler(BaseHandler):
+    def func_after_find_talk(self, result, info):
+        if result:
+            latest_id = info
+        
+            talks = filter(lambda x: x['_id'] > latest_id, result)
+            self.items_info = []
+            
+            for talk in talks:
+                self.items_info.append(
+                    {
+                        'mission_id': talk['mission_id'],
+                        'talking_email': talk['talking_email'],
+                        'talking_content': talk['talking_content'],
+                    }
+                )
+            
+            message_json = json.dumps({'response': self.items_info})
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+
+            self.finish()
+            return
+        
+        else:
+            message_json = json.dumps({'response': 'fail'})    
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+
+            self.finish()
+            return
+            
+    
+    def func_after_find_item(self, result, info):
+        if result:
+            query = self.query_talk
+            info = info
+            
+            collection = db_handler.DBHandler(self.client, 'resource', 'talks')
+            collection.do_find(query, self.func_after_find_talks, info, direction=-1, axis="_id", limit=15)
+    
     
     @tornado.web.asynchronous
     def post(self):
@@ -578,9 +621,13 @@ class ItemGetTalkHandler(BaseHandler):
             }
         }
         
+        self.query_talk = {
+            'item_id': ObjectId(item_id),
+        }
         
-        collection = db_handler.DBHandler(self.client, 'resource', 'talks')
-        collection.do_find({}, self.func_after_find_item, info, direction=-1, axis="_id", limit=15)
+        
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+        collection.do_find_one(self.query_item, self.func_after_find_item, info)
         
         
         
