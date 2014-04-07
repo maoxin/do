@@ -529,16 +529,17 @@ class ItemTalkHandler(BaseHandler):
             self.finish()
             return
     
+    @tornado.web.asynchronous
     def post(self):
         print 'talk_in_item'
         print datetime.now()
         with open('./log/logfile.txt', 'a') as log:
-            log.write('archive_item, ' + str(datetime.now()) + '\n')
+            log.write('talk_in_item, ' + str(datetime.now()) + '\n')
             
         json_file = json.loads(self.get_argument('JSON_ITEM_TALK'))
         item_id = json_file['mission_id']
-        talking_email = json_file('talking_email')
-        talking_content = json_file('talking_content')
+        talking_email = json_file['talking_email']
+        talking_content = json_file['talking_content']
         
         info = {
             'item_id': item_id,
@@ -547,3 +548,39 @@ class ItemTalkHandler(BaseHandler):
         }
         
         self.client.resource.talks.insert(info, callback=self.after_insert_func)
+        
+class ItemGetTalkHandler(BaseHandler):
+    
+    @tornado.web.asynchronous
+    def post(self):
+        print 'get_talk_in_item'
+        print datetime.now()
+        with open('./log/logfile.txt', 'a') as log:
+            log.write('get_talk_in_item, ' + str(datetime.now()) + '\n')
+            
+        json_file = json.loads(self.get_argument('JSON_ITEM_GET_TALK'))
+        item_id = json_file['mission_id']
+        join_email = json_file['join_email']
+        talk_ids = list(np.unique(json_file['talk_ids']))
+        
+        talk_ids = [ObjectId(x) for x in talk_ids]
+        self.talk_ids = talk_ids
+        
+        if not talk_ids or not talk_ids[0]:
+            info = 0
+        else:
+            info = max(talk_ids)
+            
+        self.query_item = {
+            '_id': ObjectId(item_id),
+            'attendee': {
+                '$in': [join_email],
+            }
+        }
+        
+        
+        collection = db_handler.DBHandler(self.client, 'resource', 'talks')
+        collection.do_find({}, self.func_after_find_item, info, direction=-1, axis="_id", limit=15)
+        
+        
+        
