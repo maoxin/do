@@ -509,6 +509,26 @@ class ArchiveItemHandler(BaseHandler):
         document = collection.do_find_one(self.query, self.func_insert, info)
 
 class ItemTalkHandler(BaseHandler):
+    def after_insert_func(self, result, error):
+        if not error:
+
+            message = {"response": 'ok'}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+            
+        else:
+            message = {"response": error}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            
+            self.finish()
+            return
+    
     def post(self):
         print 'talk_in_item'
         print datetime.now()
@@ -520,4 +540,10 @@ class ItemTalkHandler(BaseHandler):
         talking_email = json_file('talking_email')
         talking_content = json_file('talking_content')
         
+        info = {
+            'item_id': item_id,
+            'talking_email': talking_email,
+            'talking_content': talking_content
+        }
         
+        self.client.resource.talks.insert(info, callback=self.after_insert_func)
