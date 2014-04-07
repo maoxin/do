@@ -34,7 +34,7 @@ application = tornado.web.Application([
     (r'/item/archive', item_handler.ArchiveItemHandler),
     (r'/relation/follow', relation_handler.FollowHandler),
     # post the latest items stored in mobile and get the new one.
-    # (r'/item/talk_in_item', communication_handler.ItemTalkHandler),
+    (r'/item/talk_in_item', item_handler.ItemTalkHandler),
     # (r'/item/get_talk_in_item', communication_handler.ItemGetTalkHandler),
 	], **settings)
  
