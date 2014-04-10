@@ -556,6 +556,8 @@ class ItemTalkHandler(BaseHandler):
         
 class ItemGetTalkHandler(BaseHandler):
     def func_after_find_talks(self, result, info):
+        print result
+        
         if result:
             latest_id = info
         
