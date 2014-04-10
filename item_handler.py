@@ -546,7 +546,7 @@ class ItemTalkHandler(BaseHandler):
         talking_content = json_file['talking_content']
         
         info = {
-            'item_id': item_id,
+            'item_id': ObjectId(item_id),
             'talking_email': talking_email,
             'talking_name':  talking_name,
             'talking_content': talking_content
@@ -574,7 +574,6 @@ class ItemGetTalkHandler(BaseHandler):
                 )
             
             message_json = json.dumps({'response': self.items_info})
-            print message_json
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
 
