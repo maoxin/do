@@ -561,7 +561,6 @@ class ItemGetTalkHandler(BaseHandler):
             latest_id = info
         
             talks = filter(lambda x: x['_id'] > latest_id, result)
-            print talks
             self.items_info = []
             
             for talk in talks:
