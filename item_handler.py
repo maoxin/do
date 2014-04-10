@@ -565,8 +565,8 @@ class ItemGetTalkHandler(BaseHandler):
             for talk in talks:
                 self.items_info.append(
                     {
-                        'talking_id': talk['_id'],
-                        'mission_id': talk['item_id'],
+                        'talking_id': str(talk['_id']),
+                        'mission_id': str(talk['item_id']),
                         'talking_email': talk['talking_email'],
                         'talking_name':  talk['talking_name'],
                         'talking_content': talk['talking_content'],
