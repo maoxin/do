@@ -574,6 +574,7 @@ class ItemGetTalkHandler(BaseHandler):
                 )
             
             message_json = json.dumps({'response': self.items_info})
+            print message_json
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
 
