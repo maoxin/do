@@ -542,11 +542,13 @@ class ItemTalkHandler(BaseHandler):
         json_file = json.loads(self.get_argument('JSON_ITEM_TALK'))
         item_id = json_file['mission_id']
         talking_email = json_file['talking_email']
+        talking_name = json_file['talking_name']
         talking_content = json_file['talking_content']
         
         info = {
             'item_id': item_id,
             'talking_email': talking_email,
+            'talking_name':  talking_name,
             'talking_content': talking_content
         }
         
@@ -563,8 +565,10 @@ class ItemGetTalkHandler(BaseHandler):
             for talk in talks:
                 self.items_info.append(
                     {
+                        'talking_id': talk['_id'],
                         'mission_id': talk['mission_id'],
                         'talking_email': talk['talking_email'],
+                        'talking_name':  talk['talking_name'],
                         'talking_content': talk['talking_content'],
                     }
                 )
