@@ -556,9 +556,8 @@ class ItemTalkHandler(BaseHandler):
         
 class ItemGetTalkHandler(BaseHandler):
     def func_after_find_talks(self, result, info):
-        print result
-        
         if result:
+            print "A"
             latest_id = info
         
             talks = filter(lambda x: x['_id'] > latest_id, result)
