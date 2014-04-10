@@ -555,7 +555,7 @@ class ItemTalkHandler(BaseHandler):
         self.client.resource.talks.insert(info, callback=self.after_insert_func)
         
 class ItemGetTalkHandler(BaseHandler):
-    def func_after_find_talk(self, result, info):
+    def func_after_find_talks(self, result, info):
         if result:
             latest_id = info
         
