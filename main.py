@@ -23,7 +23,7 @@ settings = {
 class MainWebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
         self.write_message("connected")
-        print 'connected'
+        print 'connected websocket'
         
     def on_message(self, message):
         self.write_message("receive message")
