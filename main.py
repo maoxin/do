@@ -8,7 +8,7 @@ import item_handler
 import relation_handler
 import tornado.websocket
 
-client = motor.MotorClient().open_sync()
+client = motor.MotorClient()
 # use the motor(http://motor.readthedocs.org) to operate mongodb in tornado.
 
 settings = {
