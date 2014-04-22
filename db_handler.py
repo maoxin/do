@@ -8,21 +8,17 @@ class DBHandler(object):
         self.cl = client[db][collection]
     
     
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def do_find_one(self, pairs, func, info):
-        result = yield motor.Op(
-            self.cl.find_one, pairs
-        )
-        print 'query', pairs
-        print 'info', info
+        result = yield self.cl.find_one(pairs)
         func(result, info)
         
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def do_find(self, pairs, func, info, direction=pymongo.ASCENDING, axis='_id', limit=10):
         cursor = self.cl.find(pairs)
         cursor.sort( [(axis, direction)] ).limit(limit)
         
-        result = yield motor.Op(cursor.to_list(length=limit))
+        result = yield cursor.to_list(length=limit)
         
         func(result, info)
         
