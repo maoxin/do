@@ -1,12 +1,13 @@
-import tornado.web
-import db_handler
-from bson.objectid import ObjectId
-import info_encrypt
 import json
-from datetime import datetime
 import base64
 import numpy as np
+import tornado.web
+import db_handler
+import info_encrypt
+from datetime import datetime
+from bson.objectid import ObjectId
 from base_handler import BaseHandler
+from log_info import log_info
         
 class PostItemHandler(BaseHandler):
     def func(self, result, error):
@@ -33,10 +34,7 @@ class PostItemHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print "post item"
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('post item, ' + str(datetime.now()) + '\n')
+        log_info('post_item', self.client)
         
         json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
         up_email = json_file['mission_up_email']
@@ -119,10 +117,7 @@ class PostItemPicure(BaseHandler):
    
     @tornado.web.asynchronous
     def post(self):
-        print 'post picture'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('post picture, ' + str(datetime.now()) + '\n')
+        log_info('post_picture', self.client)
         
         json_file = json.loads(self.get_argument('JSON_IMAGE'))
         name = json_file['mission_name']
@@ -217,10 +212,7 @@ class GetNewItemHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print 'get_new_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('get_new_item, ' + str(datetime.now()) + '\n')
+        log_info('get_new_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_NEW_ITEM'))
 
@@ -241,10 +233,7 @@ class GetNewItemHandler(BaseHandler):
 
 class GetMissionPictureHandler(BaseHandler):
     def post(self):
-        print 'get picture'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('get picture, ' + str(datetime.now()) + '\n')
+        log_info('get_picture', self.client)
         
         json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
         name = json_file['picture_path']
@@ -339,10 +328,7 @@ class RecieveItemHandler(BaseHandler):
 
     @tornado.web.asynchronous
     def post(self):
-        print 'recieve_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('recieve_item, ' + str(datetime.now()) + '\n')
+        log_info('recieve_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         item_id = json_file['mission_id']
@@ -413,10 +399,7 @@ class DeleteItemHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print 'delete_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('delete_item, ' + str(datetime.now()) + '\n')
+        log_info('delete_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
         item_id = json_file['mission_id']
@@ -486,10 +469,7 @@ class ArchiveItemHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print 'archive_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('archive_item, ' + str(datetime.now()) + '\n')
+        log_info('archive_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_ARCHIVE_ITEM'))
         item_id = json_file['mission_id']
@@ -528,10 +508,7 @@ class ItemTalkHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print 'talk_in_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('talk_in_item, ' + str(datetime.now()) + '\n')
+        log_info('talk_in_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_ITEM_TALK'))
         item_id = json_file['mission_id']
@@ -595,10 +572,7 @@ class ItemGetTalkHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print 'get_talk_in_item'
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-            log.write('get_talk_in_item, ' + str(datetime.now()) + '\n')
+        log_info('get_talks_in_item', self.client)
             
         json_file = json.loads(self.get_argument('JSON_ITEM_GET_TALK'))
         item_id = json_file['mission_id']

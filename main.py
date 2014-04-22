@@ -1,12 +1,12 @@
+import os
+import motor
+import pymongo
 import tornado.web
 import tornado.ioloop
-import pymongo
-import motor
+import tornado.websocket
 import account_handler
-import os
 import item_handler
 import relation_handler
-import tornado.websocket
 
 client = motor.MotorClient()
 # use the motor(http://motor.readthedocs.org) to operate mongodb in tornado.
@@ -15,22 +15,22 @@ settings = {
     'degbug': True,
     'autoreload': True,
     'client': client,
-    'cookie_secret': 'a secret cookie should not be told.',
+    # 'cookie_secret': 'a secret cookie should not be told.',
     # we can use something more secret stored in db.
-    'static_path': os.path.join(os.path.dirname(__file__), 'static'),
+    # 'static_path': os.path.join(os.path.dirname(__file__), 'static'),
 }
 
-class MainWebSocket(tornado.websocket.WebSocketHandler):
-    def open(self):
-        self.write_message("connected")
-        print 'connected websocket'
-        
-    def on_message(self, message):
-        self.write_message("receive message")
-        print message
-    
-    def on_close(self):
-        print "close"
+# class MainWebSocket(tornado.websocket.WebSocketHandler):
+#     def open(self):
+#         self.write_message("connected")
+#         print 'connected websocket'
+#         
+#     def on_message(self, message):
+#         self.write_message("receive message")
+#         print message
+#     
+#     def on_close(self):
+#         print "close"
 
 application = tornado.web.Application([
     # (r'/is_logged', account_handler.IsLoggedHandler),
@@ -38,18 +38,24 @@ application = tornado.web.Application([
     #  and login to read more. 
     (r'/login', account_handler.LoginHandler),
     (r'/register', account_handler.RegisterHandler),
+    
     (r'/item/post_item', item_handler.PostItemHandler),
     (r'/item/picture', item_handler.PostItemPicure),
+    
     (r'/item/get_new_item', item_handler.GetNewItemHandler),
-    (r'/item/receive', item_handler.RecieveItemHandler),
     (r'/item/get_mission_picture', item_handler.GetMissionPictureHandler),
+    
+    (r'/item/receive', item_handler.RecieveItemHandler),
     (r'/item/delete', item_handler.DeleteItemHandler),
     (r'/item/archive', item_handler.ArchiveItemHandler),
+    
     (r'/relation/follow', relation_handler.FollowHandler),
     # post the latest items stored in mobile and get the new one.
+    
     (r'/item/talk_in_item', item_handler.ItemTalkHandler),
     (r'/item/get_talk_in_item', item_handler.ItemGetTalkHandler),
-    (r'/websocket', MainWebSocket),
+    
+    # (r'/websocket', MainWebSocket),
 	], **settings)
  
 if __name__ == '__main__':   

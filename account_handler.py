@@ -1,9 +1,10 @@
+import json
 import tornado.web
 import db_handler
 import info_encrypt
-import json
 from datetime import datetime
 from base_handler import BaseHandler
+from log_info import log_info
         
 class LoginHandler(BaseHandler):
     """Response for request for login"""
@@ -32,10 +33,7 @@ class LoginHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print "connected"
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-                    log.write('connected, ' + str(datetime.now()) + '\n')
+        log_info('user_connected', self.client)
         
         json_file = json.loads(self.get_argument('JSON_LOGIN'))
         tag = json_file['tag']
@@ -74,10 +72,7 @@ class RegisterHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print "register"
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-                    log.write('register, ' + str(datetime.now()) + '\n')
+        log_info('register', self.client)
         
         json_file = json.loads(self.get_argument('JSON_SIGN'))
         name = json_file['name']

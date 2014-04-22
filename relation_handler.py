@@ -3,6 +3,7 @@ import db_handler
 import json
 from datetime import datetime
 from base_handler import BaseHandler
+from log_info import log_info
         
 class FollowHandler(BaseHandler):
     def func(self, result, info):
@@ -27,10 +28,7 @@ class FollowHandler(BaseHandler):
     
     @tornado.web.asynchronous
     def post(self):
-        print "follow"
-        print datetime.now()
-        with open('./log/logfile.txt', 'a') as log:
-                    log.write('follow, ' + str(datetime.now()) + '\n')
+        log_info('follow', self.client)
         
         json_file = json.loads(self.get_argument('JSON_FOLLOW'))
         follower_email = json_file['follower_email']
