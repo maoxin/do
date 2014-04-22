@@ -1,5 +1,12 @@
+# python package
 tornado
 passlib
 pybcrypt
 motor
 pymongo
+
+# system
+mongodb
+
+# directory
+log, photo
