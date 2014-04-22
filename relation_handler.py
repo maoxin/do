@@ -2,11 +2,7 @@ import tornado.web
 import db_handler
 import json
 from datetime import datetime
-
-class BaseHandler(tornado.web.RequestHandler):
-    
-    def prepare(self):
-        self.client = self.settings['client']
+from base_handler import BaseHandler
         
 class FollowHandler(BaseHandler):
     def func(self, result, info):

@@ -3,12 +3,7 @@ import db_handler
 import info_encrypt
 import json
 from datetime import datetime
-
-class BaseHandler(tornado.web.RequestHandler):
-    
-    def prepare(self):
-        self.client = self.settings['client']
-    
+from base_handler import BaseHandler
         
 class LoginHandler(BaseHandler):
     """Response for request for login"""

@@ -6,11 +6,15 @@ motor
 pymongo
 
 # system
+ipython
+numpy
 mongodb
 pip
 virtualenv
 screen
 git
+python-dev
+
 
 # directory
 log, photo

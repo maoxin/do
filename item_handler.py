@@ -5,13 +5,8 @@ import info_encrypt
 import json
 from datetime import datetime
 import base64
-from java_list import get_str_list
 import numpy as np
-
-class BaseHandler(tornado.web.RequestHandler):
-    
-    def prepare(self):
-        self.client = self.settings['client']
+from base_handler import BaseHandler
         
 class PostItemHandler(BaseHandler):
     def func(self, result, error):
@@ -229,7 +224,6 @@ class GetNewItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_NEW_ITEM'))
 
-        # ids = get_str_list(json_file['ids'][0])
         ids = list(np.unique(json_file['ids']))
         print ids
         ids = [ObjectId(x) for x in ids]
