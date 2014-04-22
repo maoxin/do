@@ -3,10 +3,10 @@ import motor
 import pymongo
 import tornado.web
 import tornado.ioloop
-import tornado.websocket
 import account_handler
 import item_handler
 import relation_handler
+import web_socket_handler
 
 client = motor.MotorClient()
 # use the motor(http://motor.readthedocs.org) to operate mongodb in tornado.
@@ -19,18 +19,6 @@ settings = {
     # we can use something more secret stored in db.
     # 'static_path': os.path.join(os.path.dirname(__file__), 'static'),
 }
-
-# class MainWebSocket(tornado.websocket.WebSocketHandler):
-#     def open(self):
-#         self.write_message("connected")
-#         print 'connected websocket'
-#         
-#     def on_message(self, message):
-#         self.write_message("receive message")
-#         print message
-#     
-#     def on_close(self):
-#         print "close"
 
 application = tornado.web.Application([
     # (r'/is_logged', account_handler.IsLoggedHandler),
@@ -55,7 +43,7 @@ application = tornado.web.Application([
     (r'/item/talk_in_item', item_handler.ItemTalkHandler),
     (r'/item/get_talk_in_item', item_handler.ItemGetTalkHandler),
     
-    # (r'/websocket', MainWebSocket),
+    (r'/talk_web_socket', web_socket_handler.TalkWebSocket),
 	], **settings)
  
 if __name__ == '__main__':   
