@@ -22,7 +22,7 @@ class DBHandler(object):
         cursor = self.cl.find(pairs)
         cursor.sort( [(axis, direction)] ).limit(limit)
         
-        result = yield motor.Op(cursor.to_list)
+        result = yield motor.Op(cursor.to_list(limit))
         
         func(result, info)
         
