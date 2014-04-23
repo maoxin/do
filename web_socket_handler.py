@@ -1,11 +1,10 @@
 import json
 import motor
-from base_handler import BaseWebSocketHandler
 from log_info import log_info
 
 client = motor.MotorClient()
 
-class TalkWebSocket(BaseWebSocketHandler):
+class TalkWebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
         log_info('web_socket_connected', client)
         
