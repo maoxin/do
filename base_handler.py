@@ -1,5 +1,8 @@
+import motor
 import tornado.web
 import tornado.websocket
+
+client = motor.MotorClient()
 
 class BaseHandler(tornado.web.RequestHandler):
     
@@ -9,4 +12,4 @@ class BaseHandler(tornado.web.RequestHandler):
 class BaseWebSocketHandler(tornado.websocket.WebSocketHandler):
     
     def prepare(self):
-        self.client = self.settings['client']
+        self.client = client
