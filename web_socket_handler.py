@@ -18,9 +18,12 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
             'talk_name': self.name,
             'talk_content': content,
         }
-    
-        for attendee in TalkWebSocket.attendees:
+        print "a"
+
+        for attendee in TalkWebSocket.attendees[self.item_id]:
             attendee.write_message(info)
+
+        print "b"
         
     def on_message(self, message):
         json_file = json.loads(message)

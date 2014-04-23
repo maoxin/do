@@ -495,8 +495,8 @@ class ItemTalkHandler(BaseHandler):
             
             talk_man_group = TalkWebSocket.attendees[item_id]
             talk_man = filter(lambda man: man.name == name, talk_man_group)[0]
-            talk_man.write_content_to_team_mate(content)
-            
+            # talk_man.write_content_to_team_mate(content)
+
             message = {"response": 'ok'}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
