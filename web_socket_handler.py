@@ -72,6 +72,6 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
         log_info('web_socket_disconnected', client)
         print self.email, 'disconnected'
         
-TalkWebSocket.attendee = {}   
+TalkWebSocket.attendees = {}   
 
         
