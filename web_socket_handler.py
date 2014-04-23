@@ -1,14 +1,18 @@
 import json
-import tornado.websocket
+from base_handler import BaseWebSocketHandler
+from log_info import log_info
 
-class TalkWebSocket(tornado.websocket.WebSocketHandler):
+class TalkWebSocket(BaseWebSocketHandler):
     def open(self):
+        log_info('web_socket_connected', self.client)
+        
         self.write_message({'status': "connected"})
         
     def on_message(self, message):
         json_file = json.loads(message)
         
         if json_file.has_key('status') and json_file['status'] == 'log_in':
+            log_info('web_socket_logged', self.client)
             try:
                 name = json_file['name']
                 email = json_file['email']
@@ -30,6 +34,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 
         
         elif json_file.has_key('status') and json_file['status'] == 'talk':
+            log_info('web_socket_talk', self.client)
             try:
                 content = json_file['talk_content']
                 
@@ -50,6 +55,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                     
                 
     def on_close(self):
+        log_info('web_socket_disconnected', self.client)
         print self.email, 'disconnected'
         
     
