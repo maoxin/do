@@ -14,4 +14,4 @@ class BaseWebSocketHandler(tornado.websocket.WebSocketHandler):
         super(BaseWebSocketHandler, self).__init__()
         
         
-BaseWebSocketHandler.client = client
+# BaseWebSocketHandler.client = client
