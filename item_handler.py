@@ -4,6 +4,7 @@ import numpy as np
 import tornado.web
 import db_handler
 import info_encrypt
+from web_socket_handler import TalkWebSocket
 from datetime import datetime
 from bson.objectid import ObjectId
 from base_handler import BaseHandler
@@ -488,7 +489,14 @@ class ArchiveItemHandler(BaseHandler):
 class ItemTalkHandler(BaseHandler):
     def after_insert_func(self, result, error):
         if not error:
-
+            item_id = str(self.info['item_id'])
+            name = self.info['talking_name']
+            content = self.info['talking_content']
+            
+            talk_man_group = TalkWebSocket.attendees[item_id]
+            talk_man = filter(lambda man: man.name == name, talk_man_group)[0]
+            talk_man.write_content_to_team_mate(content)
+            
             message = {"response": 'ok'}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
@@ -516,14 +524,14 @@ class ItemTalkHandler(BaseHandler):
         talking_name = json_file['talking_name']
         talking_content = json_file['talking_content']
         
-        info = {
+        self.info = {
             'item_id': ObjectId(item_id),
             'talking_email': talking_email,
             'talking_name':  talking_name,
             'talking_content': talking_content
         }
         
-        self.client.resource.talks.insert(info, callback=self.after_insert_func)
+        self.client.resource.talks.insert(self.info, callback=self.after_insert_func)
         
 class ItemGetTalkHandler(BaseHandler):
     def func_after_find_talks(self, result, info):

@@ -7,6 +7,17 @@ class TalkWebSocket(BaseWebSocketHandler):
         log_info('web_socket_connected', self.client)
         
         self.write_message({'status': "connected"})
+    
+    
+    def write_content_to_team_mate(self, content):
+        info = {
+            'status': 'get_talk',
+            'talk_name': self.name,
+            'talk_content': content,
+        }
+    
+        for attendee in TalkWebSocket.attendees:
+            attendee.write_message(info)
         
     def on_message(self, message):
         json_file = json.loads(message)
