@@ -1,10 +1,13 @@
 import json
+import motor
 from base_handler import BaseWebSocketHandler
 from log_info import log_info
 
+client = motor.MotorClient()
+
 class TalkWebSocket(BaseWebSocketHandler):
     def open(self):
-        # log_info('web_socket_connected', BaseWebSocketHandler.client)
+        log_info('web_socket_connected', client)
         
         self.write_message({'status': "connected"})
     
@@ -23,7 +26,7 @@ class TalkWebSocket(BaseWebSocketHandler):
         json_file = json.loads(message)
         
         if json_file.has_key('status') and json_file['status'] == 'log_in':
-            # log_info('web_socket_logged', BaseWebSocketHandler.client)
+            log_info('web_socket_logged', client)
             try:
                 name = json_file['name']
                 email = json_file['email']
@@ -45,7 +48,7 @@ class TalkWebSocket(BaseWebSocketHandler):
                 
         
         elif json_file.has_key('status') and json_file['status'] == 'talk':
-            # log_info('web_socket_talk', BaseWebSocketHandler.client)
+            log_info('web_socket_talk', client)
             try:
                 content = json_file['talk_content']
                 
@@ -66,7 +69,7 @@ class TalkWebSocket(BaseWebSocketHandler):
                     
                 
     def on_close(self):
-        # log_info('web_socket_disconnected', BaseWebSocketHandler.client)
+        log_info('web_socket_disconnected', client)
         print self.email, 'disconnected'
         
     
