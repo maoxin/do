@@ -10,6 +10,8 @@ class BaseHandler(tornado.web.RequestHandler):
         self.client = self.settings['client']
         
 class BaseWebSocketHandler(tornado.websocket.WebSocketHandler):
-    
-    def prepare(self):
-        self.client = client
+    def __init__(self):
+        super(BaseWebSocketHandler, self).__init__()
+        
+        
+BaseWebSocketHandler.client = client
