@@ -579,7 +579,7 @@ class ItemGetTalkHandler(BaseHandler):
             info = info
             
             collection = db_handler.DBHandler(self.client, 'resource', 'talks')
-            collection.do_find(query, self.func_after_find_talks, info, direction=-1, axis="_id", limit=15)
+            collection.do_find(query, self.func_after_find_talks, info, direction=-1, axis="_id", limit=10)
     
     
     @tornado.web.asynchronous
