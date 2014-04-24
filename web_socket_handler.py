@@ -17,19 +17,15 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
             'status': 'get_talk',
             'talk_name': self.name,
             'talk_content': content,
+            'item_id': self.item_id,
         }
-        print "a"
 
         for attendee in TalkWebSocket.attendees[self.item_id]:
             attendee.write_message(info)
 
-        print "b"
         
     def on_message(self, message):
-        print "A"
-        print message
         json_file = json.loads(message)
-        print json_file
         
         if json_file.has_key('status') and json_file['status'] == 'log_in':
             log_info('web_socket_logged', client)
@@ -76,6 +72,9 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 
     def on_close(self):
         log_info('web_socket_disconnected', client)
+        TalkWebSocket.attendees[item_id].pop(TalkWebSocket.attendees.index(self))
+        if not TalkWebSocket.attendees[self.item_id]:
+            TalkWebSocket.attendees.pop[self.item_id]
         
 TalkWebSocket.attendees = {}   
 

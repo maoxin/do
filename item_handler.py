@@ -492,15 +492,20 @@ class ItemTalkHandler(BaseHandler):
             item_id = str(self.info['item_id'])
             name = self.info['talking_name']
             content = self.info['talking_content']
-            
-            talk_man_group = TalkWebSocket.attendees[item_id]
-            talk_man = filter(lambda man: man.name == name, talk_man_group)[0]
-            # talk_man.write_content_to_team_mate(content)
 
             message = {"response": 'ok'}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
+            
+            try:
+                talk_man_group = TalkWebSocket.attendees[item_id]
+                talk_man_pool = filter(lambda man: man.name == name, talk_man_group)
+                if talk_man_pool:
+                    talk_man = talk_man_pool[0]
+                    talk_man.write_content_to_team_mate(content)
+            except KeyError:
+                raise KeyError
             
             self.finish()
             return
