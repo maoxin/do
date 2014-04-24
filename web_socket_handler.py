@@ -76,7 +76,6 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 
     def on_close(self):
         log_info('web_socket_disconnected', client)
-        print 'disconnected'
         
 TalkWebSocket.attendees = {}   
 
