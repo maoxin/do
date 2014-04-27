@@ -499,6 +499,7 @@ class ItemTalkHandler(BaseHandler):
             self.write(message_json)
             
             try:
+                print 'try send to every one'
                 talk_man_group = TalkWebSocket.attendees[item_id]
                 print 'talk_man_group,', len(talk_man_group)
                 talk_man_pool = filter(lambda man: man.name == name, talk_man_group)
