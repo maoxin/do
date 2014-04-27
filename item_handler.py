@@ -500,7 +500,9 @@ class ItemTalkHandler(BaseHandler):
             
             try:
                 talk_man_group = TalkWebSocket.attendees[item_id]
+                print 'talk_man_group,', len(talk_man_group)
                 talk_man_pool = filter(lambda man: man.name == name, talk_man_group)
+                print 'talk_man_pool', len(talk_man_pool)
                 if talk_man_pool:
                     talk_man = talk_man_pool[0]
                     talk_man.write_content_to_team_mate(content)
