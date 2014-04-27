@@ -74,6 +74,6 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
         log_info('web_socket_disconnected', client)
         TalkWebSocket.attendees[self.item_id].pop(TalkWebSocket.attendees.index(self))
         if not TalkWebSocket.attendees[self.item_id]:
-            TalkWebSocket.attendees.pop[self.item_id]   
+            TalkWebSocket.attendees.pop(self.item_id)   
 
 TalkWebSocket.attendees = {}        
