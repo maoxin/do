@@ -39,7 +39,13 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 self.item_id = item_id
                 
                 if TalkWebSocket.attendees.has_key(item_id):
-                    TalkWebSocket.attendees[item_id].append(self)
+                    for item in TalkWebSocket.attendees[titem_id]:
+                        if item.email == self.email:
+                            self.write_message( {'status': 'already exist'} )
+                            break
+                    else:
+                        TalkWebSocket.attendees[item_id].append(self)
+                
                 else:
                     TalkWebSocket.attendees[item_id] = [self, ]
         
