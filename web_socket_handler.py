@@ -78,8 +78,11 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 
     def on_close(self):
         log_info('web_socket_disconnected', client)
-        TalkWebSocket.attendees[self.item_id].pop(TalkWebSocket.attendees[self.item_id].index(self))
-        if not TalkWebSocket.attendees[self.item_id]:
-            TalkWebSocket.attendees.pop(self.item_id)   
+        try:
+            TalkWebSocket.attendees[self.item_id].pop(TalkWebSocket.attendees[self.item_id].index(self))
+            if not TalkWebSocket.attendees[self.item_id]:
+                TalkWebSocket.attendees.pop(self.item_id)   
+        except ValueError:
+            raise ValueError
 
 TalkWebSocket.attendees = {}        
