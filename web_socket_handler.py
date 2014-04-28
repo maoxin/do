@@ -83,6 +83,6 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
             if not TalkWebSocket.attendees[self.item_id]:
                 TalkWebSocket.attendees.pop(self.item_id)   
         except ValueError:
-            raise ValueError
+            print 'Already logged out', TalkWebSocket.attendees.pop(self.item_id)
 
 TalkWebSocket.attendees = {}        
