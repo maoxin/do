@@ -54,6 +54,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 self.write_message( {'status': 'add_to_talk_list'} )
             
             except KeyError:
+                print 'Key Error in talk web socket'
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
                 
         
