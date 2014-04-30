@@ -110,6 +110,7 @@ class ChangeProfileHandler(BaseHandler):
                 "change_password": "ok",
                 "change_name":     "ok",
                 "change_picture":  "ok",
+                "change_describe": "ok",
             }
             
             message_json = json.dumps(message)
@@ -137,6 +138,7 @@ class ChangeProfileHandler(BaseHandler):
                 "change_name": "name been used",
                 "change_password": "ok",
                 "change_picture":  "ok",
+                "change_describe": "ok",
             }
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
@@ -172,6 +174,7 @@ class ChangeProfileHandler(BaseHandler):
                     "change_password": "password wrong",
                     "change_name":     "ok",
                     "change_picture":  "ok",
+                    "change_describe": "ok",
                 }
                 
                 message_json = json.dumps(message)
@@ -194,7 +197,7 @@ class ChangeProfileHandler(BaseHandler):
     def post(self):
         log_info('change_profile', self.client)
         
-        self.allow_item = ['name', 'password', 'picture']
+        self.allow_item = ['name', 'password', 'picture', 'describe']
         json_file = json.loads(self.get_argument('JSON_CHANGE_PROFILE'))
         
         self.email = json_file['tag']
@@ -215,3 +218,16 @@ class ChangeProfileHandler(BaseHandler):
         self.collection.do_find_one(query, self.func, info)
         
        
+class GetProfilePictureHandler(BaseHandler):
+    def post(self):
+        log_info('get_profile_picture', self.client)
+        
+        json_file = json.loads(self.get_argument('JSON_PROFILE_PICTURE_GET'))
+        name = json_file['picture_path']
+        print name
+
+        picture = open(name, 'r').read()
+        self.set_header("Content-Type", "image/png; charset=utf-8")
+        self.write(picture)
+        
+        return
