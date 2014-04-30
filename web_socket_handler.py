@@ -150,7 +150,8 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                         'status': 'fresh_position',
                         'time': json_file['time'],
                         'mission_id': self.item_id,
-                        'name': self.name,
+                        'email': self.email,
+                        'name':  self.name,
                         'lat': lat,
                         'lon': lon,
                     }
