@@ -4,6 +4,7 @@ passlib
 pybcrypt
 motor
 pymongo
+dateutil
 
 # system
 ipython
