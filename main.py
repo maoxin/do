@@ -44,6 +44,7 @@ application = tornado.web.Application([
     (r'/item/get_talk_in_item', item_handler.ItemGetTalkHandler),
     
     (r'/talk_web_socket', web_socket_handler.TalkWebSocket),
+    (r'/position_web_socket', web_socket_handler.MapWebSocket),
 	], **settings)
  
 if __name__ == '__main__':   
