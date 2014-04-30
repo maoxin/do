@@ -102,6 +102,115 @@ class RegisterHandler(BaseHandler):
         collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
         collection.do_find_one(query, self.func, info)
             
+class ChangeProfileHandler(BaseHandler):
+    def func_response(self, result, error):
+        if not error:
+            message = {
+                "change_password": "ok",
+                "change_name":     "ok",
+                "change_picture":  "ok",
+            }
+            
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
         
+            self.finish()
+            return
+            
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return
+    
+    def func_after_check_name(self, result, info):
+        if not result:
+            self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+        
+        else:
+            message = {
+                "change_name": "name been used",
+                "change_password": "ok",
+                "change_picture":  "ok",
+            }
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return
+    
+    def func(self, result, info):
+        
+        if result and info_encrypt.match(result['password'], self.password):
+            if info.has_key('picture'):
+                pic_decode = base64.b64decode(picture)
+                pic_path = './user_photos/' + info['email'] + '.png'
+                with open(pic_path, 'wb') as pc:
+                    pc.write(pic_decode)
+                
+                info['picture_path'] = pic_path
+                info.pop['picture']
+            
+            if info.has_key('name'):
+                query = {'name': info['name']}
+                self.collection.do_find_one(query, self.func_after_check_name, info)
+            
+            if info.has_key('password'):
+                info['password'] = info_encrypt.encrypt(info['password'])
+                
+                self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+        
+        else:
+            if info_encrypt.match(result['password'], self.password):
+                message = {
+                    "change_password": "password wrong",
+                    "change_name":     "ok",
+                    "change_picture":  "ok",
+                }
+                
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+            
+                self.finish()
+                return
+            
+            else:
+                message = {"response": "fail"}
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+            
+                self.finish()
+                return       
+    
+    @tornado.web.asynchronous
+    def post(self):
+        log_info('change_profile', self.client)
+        
+        self.allow_item = ['name', 'password', 'picture']
+        json_file = json.loads(self.get_argument('JSON_CHANGE_PROFILE'))
+        
+        self.email = json_file['tag']
+        self.password = json_file['password']
+        changes = json_file['changes']
+        
+        info = {}
+        self.has_item = []
+        for item in self.allow_item:
+            if item in changes:
+                self.has_item.append(item)
+                info[item] = json_file['change_' + item]
+        
+        
+        self.collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
+        query = {'email': self.email}
+        
+        self.collection.do_find_one(query, self.func, info)
         
        

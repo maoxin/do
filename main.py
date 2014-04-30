@@ -26,6 +26,7 @@ application = tornado.web.Application([
     #  and login to read more. 
     (r'/login', account_handler.LoginHandler),
     (r'/register', account_handler.RegisterHandler),
+    (r'/change_profile', account_handler.ChangeProfileHandler),
     
     (r'/item/post_item', item_handler.PostItemHandler),
     (r'/item/picture', item_handler.PostItemPicure),
