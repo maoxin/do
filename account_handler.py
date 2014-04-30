@@ -86,6 +86,7 @@ class RegisterHandler(BaseHandler):
             'email': email, 
             'phone': phone, 
             'password': password,
+            'picture_path': None,
             'create_time': str(datetime.now()),
         }
         
