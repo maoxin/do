@@ -129,6 +129,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 
                 self.time = datetime.now(utc)
                 self.write_message( {'status': 'add_to_talk_list'} )
+                print MapWebSocket.attendees
             
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
