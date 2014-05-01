@@ -10,6 +10,8 @@ client = motor.MotorClient()
 utc = pytz.utc
 
 class TalkWebSocket(tornado.websocket.WebSocketHandler):
+    attendees = {}
+    
     def open(self):
         log_info('talk_web_socket_connected', client)
         
@@ -96,9 +98,11 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
         except AttributeError:
             pass
 
-TalkWebSocket.attendees = {}  
+
 
 class MapWebSocket(tornado.websocket.WebSocketHandler):      
+    attendees = {}
+    
     def open(self):
         log_info('map_web_socket_connected', client)
         self.time = datetime.now(utc)
@@ -189,4 +193,4 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
         except AttributeError:
             pass
 
-MapWebSocket.attendees = {}
+
