@@ -93,7 +93,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 print 'Already logged out', TalkWebSocket.attendees[self.item_id]
             else:
                 print 'Already logged out and delete the key-value'
-        except KeyError:
+        except AttributeError:
             pass
 
 TalkWebSocket.attendees = {}  
@@ -185,7 +185,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 print 'Already logged out', MapWebSocket.attendees[self.item_id]
             else:
                 print 'Already logged out and delete the key-value'
-        except KeyError:
+        except AttributeError:
             pass
 
 MapWebSocket.attendees = {}
