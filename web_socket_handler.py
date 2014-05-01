@@ -166,6 +166,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                     }
             
                     for attendee in TalkWebSocket.attendees[self.item_id]:
+                        print 'send to:', attendee.name
                         attendee.write_message(info)
                     
             except KeyError:
