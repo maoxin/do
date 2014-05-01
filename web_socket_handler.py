@@ -101,6 +101,7 @@ TalkWebSocket.attendees = {}
 class MapWebSocket(tornado.websocket.WebSocketHandler):      
     def open(self):
         log_info('map_web_socket_connected', client)
+        self.time = datetime.now(utc)
         
         self.write_message({'status': "connected"})
     
@@ -129,7 +130,6 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 else:
                     MapWebSocket.attendees[self.item_id] = [self, ]
                 
-                self.time = datetime.now(utc)
                 self.write_message( {'status': 'add_to_talk_list'} )
             
             except KeyError:
