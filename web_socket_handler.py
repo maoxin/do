@@ -43,15 +43,15 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 self.item_id = item_id
                 
                 if TalkWebSocket.attendees.has_key(item_id):
-                    for item in TalkWebSocket.attendees[item_id]:
+                    for item in TalkWebSocket.attendees[self.item_id]:
                         if item.email == self.email:
                             self.write_message( {'status': 'already exist'} )
                             break
                     else:
-                        TalkWebSocket.attendees[item_id].append(self)
+                        TalkWebSocket.attendees[self.item_id].append(self)
                 
                 else:
-                    TalkWebSocket.attendees[item_id] = [self, ]
+                    TalkWebSocket.attendees[self.item_id] = [self, ]
         
                 self.write_message( {'status': 'add_to_talk_list'} )
             
@@ -71,7 +71,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                     'talk_content': content,
                 }
             
-                for attendee in TalkWebSocket.attendees:
+                for attendee in TalkWebSocket.attendees[self.item_id]:
                     attendee.write_message(info)
                     
             except KeyError:
@@ -93,6 +93,8 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                 print 'Already logged out', TalkWebSocket.attendees[self.item_id]
             else:
                 print 'Already logged out and delete the key-value'
+        except KeyError:
+            pass
 
 TalkWebSocket.attendees = {}  
 
@@ -116,20 +118,19 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 self.email = email
                 self.item_id = item_id
                 
-                if MapWebSocket.attendees.has_key(item_id):
-                    for item in MapWebSocket.attendees[item_id]:
+                if MapWebSocket.attendees.has_key(self.item_id):
+                    for item in MapWebSocket.attendees[self.item_id]:
                         if item.email == self.email:
                             self.write_message( {'status': 'already exist'} )
                             break
                     else:
-                        MapWebSocket.attendees[item_id].append(self)
+                        MapWebSocket.attendees[self.item_id].append(self)
                 
                 else:
-                    MapWebSocket.attendees[item_id] = [self, ]
+                    MapWebSocket.attendees[self.item_id] = [self, ]
                 
                 self.time = datetime.now(utc)
                 self.write_message( {'status': 'add_to_talk_list'} )
-                print MapWebSocket.attendees
             
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
@@ -164,7 +165,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                         'lon': lon,
                     }
             
-                    for attendee in TalkWebSocket.attendees:
+                    for attendee in TalkWebSocket.attendees[self.item_id]:
                         attendee.write_message(info)
                     
             except KeyError:
@@ -184,5 +185,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 print 'Already logged out', MapWebSocket.attendees[self.item_id]
             else:
                 print 'Already logged out and delete the key-value'
+        except KeyError:
+            pass
 
 MapWebSocket.attendees = {}
