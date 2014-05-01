@@ -103,7 +103,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
         json_file = json.loads(message)
         
         if json_file.has_key('status') and json_file['status'] == 'log_in':
-            log_info('web_socket_logged', client)
+            log_info('map_web_socket_logged', client)
             try:
                 name = json_file['name']
                 email = json_file['email']
@@ -132,7 +132,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 
         
         elif json_file.has_key('status') and json_file['status'] == 'report_position':
-            log_info('web_socket_report_map', client)
+            log_info('map_web_socket_report_map', client)
             try:
                 tm_now = datetime.now()
                 tm = parser.parse(json_file['time'])
