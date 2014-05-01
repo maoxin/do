@@ -2,10 +2,12 @@ import json
 from dateutil import parser
 from datetime import datetime
 import motor
+import pytz
 from log_info import log_info
 import tornado.websocket
 
 client = motor.MotorClient()
+utc = pytz.utc
 
 class TalkWebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
@@ -124,7 +126,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 else:
                     MapWebSocket.attendees[item_id] = [self, ]
                 
-                self.time = datetime.now()
+                self.time = datetime.now(utc)
                 self.write_message( {'status': 'add_to_talk_list'} )
             
             except KeyError:
