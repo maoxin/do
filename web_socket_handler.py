@@ -146,7 +146,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 lon = json_file['lon']
                 
                 print tm, tm_now
-                delta = tm - tm_now
+                delta = tm_now - tm
                 delta_self = tm - self.time
                 
                 if (delta.days == 0 and delta.seconds < 30) and \
