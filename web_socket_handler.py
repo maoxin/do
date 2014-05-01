@@ -76,6 +76,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                     
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
+                raise KeyError
                     
         else:
             self.write_message({'status': 'error', 'detail': 'please enter a \'status\' as \'log_in\' or \'talk\''})
