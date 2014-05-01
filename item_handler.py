@@ -490,6 +490,7 @@ class ItemTalkHandler(BaseHandler):
     def after_insert_func(self, result, error):
         if not error:
             item_id = str(self.info['item_id'])
+            email = self.info['talking_email']
             name = self.info['talking_name']
             content = self.info['talking_content']
 
@@ -500,12 +501,9 @@ class ItemTalkHandler(BaseHandler):
             
             try:
                 print 'try send to every one'
-                talk_man_group = TalkWebSocket.attendees[item_id]
-                print 'talk_man_group,', len(talk_man_group)
-                talk_man_pool = filter(lambda man: man.name == name, talk_man_group)
-                print 'talk_man_pool', len(talk_man_pool)
-                if talk_man_pool:
-                    talk_man = talk_man_pool[0]
+                talk_man = TalkWebSocket.attendees[item_id][email]
+
+                if talk_man:
                     talk_man.write_content_to_team_mate(content)
             except KeyError:
                 raise KeyError
