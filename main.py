@@ -26,6 +26,8 @@ application = tornado.web.Application([
     #  and login to read more. 
     (r'/login', account_handler.LoginHandler),
     (r'/register', account_handler.RegisterHandler),
+    (r'/look_my_profile', account_handler.LookOwnProfileHandler),
+    (r'/look_profile', account_handler.LookOtherProfile),
     (r'/change_profile', account_handler.ChangeProfileHandler),
     (r'/get_profile_picture', account_handler.GetProfilePictureHandler),
     

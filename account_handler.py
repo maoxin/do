@@ -231,3 +231,86 @@ class GetProfilePictureHandler(BaseHandler):
         self.write(picture)
         
         return
+        
+class LookOwnProfileHandler(BaseHandler):
+    def func(self, result, info):
+        if result and info_encrypt.match(result['password'], info['password']):
+            message = {
+                "response": "ok",
+                'email': result['email'], 
+                'phone': result['phone'],
+                'name': result['name'],
+                'describe': result['describe'],
+                'picture_path': result['picture_path'],
+            }
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'look own success'
+            
+            self.finish()
+            return
+    
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'connected fail'
+            
+            self.finish()
+            return
+        
+    
+    @tornado.web.asynchronous
+    def post(self):
+        log_info('look_own_profile', self.client)
+        
+        json_file = json.loads(self.get_argument('JSON_LOOK_MY_PROFILE'))
+        tag = josn_file['tag']
+        info = json_file['info']
+        password = json_file['password']
+        
+        collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
+        query = {tag: info}
+        
+        collection.do_find_one(query, self.func, {'password': password})
+        
+class LookOtherProfile(BaseHandler):
+    def func(self, result, info):
+        if result:    
+            message = {
+                "response": "ok",
+                'name': result['name'],
+                'describe': result['describe'],
+                'picture_path': result['picture_path'],
+            }
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'look own success'
+        
+            self.finish()
+            return
+
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'connected fail'
+            
+            self.finish()
+            return
+    
+    @tornado.web.asynchronous
+    def post(self):
+        log_info('look_other_profile', self.client)
+        
+        json_file = json.loads(self.get_argument('JSON_LOOK_PROFILE'))
+        name = json_file['name']
+        
+        collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
+        query = {'name': name}
+        
+        collection.do_find_one(query, self.func, {})
