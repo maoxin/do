@@ -17,6 +17,7 @@ class LoginHandler(BaseHandler):
             # print info
             message_json = json.dumps(info)
             # print message_json
+            print self.on_connection_close()
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'connected succeed'
