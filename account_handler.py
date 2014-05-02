@@ -13,6 +13,7 @@ class LoginHandler(BaseHandler):
     
     def func_write(sefl, result, info):
         print 'write may begin'
+        print result
         if reuslt:
             print 'write begin'
             message_json = json.dumps(info)
