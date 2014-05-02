@@ -15,8 +15,7 @@ class LoginHandler(BaseHandler):
         if result:
             print 'write begin'
             # print info
-            message_json = json.dumps({'response': 'ok'})
-            # message_json = json.dumps(info)
+            message_json = json.dumps(info)
             # print message_json
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
