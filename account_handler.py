@@ -59,6 +59,11 @@ class LoginHandler(BaseHandler):
                 }
             }
             
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'connected succeed'
+            
             collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
             collection.do_update({'email': result['email']}, insert_message, self.func_write, message, upsert=True)
             
