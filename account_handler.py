@@ -11,7 +11,7 @@ from log_info import log_info
 class LoginHandler(BaseHandler):
     """Response for request for login"""
     
-    def func_write(sefl, result, error):
+    def func_write(self, result, error):
         if result:
             print 'write begin'
             # print info
