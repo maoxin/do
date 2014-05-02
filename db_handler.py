@@ -24,8 +24,10 @@ class DBHandler(object):
         
     @tornado.gen.coroutine
     def do_update(self, query, change, func, info, upsert=False):
+        print 'update begin'
         result = yield cl.update(query, change, upsert=upsert)
         
+        print 'update finish'
         func(result, info)
         
     
