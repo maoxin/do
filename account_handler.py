@@ -13,6 +13,7 @@ class LoginHandler(BaseHandler):
     
     def func_write(sefl, result, info):
         if reuslt:
+            print 'write begin'
             message_json = json.dumps(info)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
@@ -35,6 +36,7 @@ class LoginHandler(BaseHandler):
     
     def func(self, result, info):
         if result and info_encrypt.match(result['password'], info['password']):
+            print 'pass ok'
             user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
             
             message = {
