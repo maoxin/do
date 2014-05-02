@@ -320,7 +320,7 @@ class LookOwnProfileHandler(BaseHandler):
             self.finish()
             return
         
-    
+    @tornado.web.asynchronous
     def func_after_check_id(self, result, info):
         if result:
             old_time = parser.parse(result['time'])
