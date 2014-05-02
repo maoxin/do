@@ -144,7 +144,7 @@ class RegisterHandler(BaseHandler):
             'create_time': str(datetime.now()),
         }
         
-        query_1 = {'email': email}
+        query_1 = {'email': self.email}
         query_2 = {'phone': phone}
         
         query = {
