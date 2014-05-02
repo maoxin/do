@@ -323,12 +323,12 @@ class LookOwnProfileHandler(BaseHandler):
             
             delta = later_time - old_time
             if (delta.days == 0 and delta.seconds < 3600):
-                query = info
+                query = {'email': result['email']}
                 collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
                 collection.do_find_one(query, self.func, {})
                 
             else:
-                message = {"response": "id_key expired"}
+                message = {"response": "id_key_expired"}
                 message_json = json.dumps(message)
                 self.set_header("Content_Type", "application/json")
                 self.write(message_json)
@@ -353,11 +353,8 @@ class LookOwnProfileHandler(BaseHandler):
             'user_id': user_id,
             'user_key': user_key,
         }
-        query_2 = {
-            tag:info
-        }
         
-        collection.do_find_one(query, self.func_after_check_id, info)
+        collection.do_find_one(query, self.func_after_check_id, {})
         
 class LookOtherProfile(BaseHandler):
     def func(self, result, info):
