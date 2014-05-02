@@ -18,6 +18,7 @@ class LoginHandler(BaseHandler):
             message_json = json.dumps(info)
             # print message_json
             print self.on_connection_close()
+            print 1
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'connected succeed'
@@ -191,7 +192,7 @@ class ChangeProfileHandler(BaseHandler):
     
     def func_after_check_name(self, result, info):
         if not result:
-            self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+            self.collection.update({'email': self.email}, {'$set': info}, callback = self.func_response)
         
         else:
             message = {
@@ -226,7 +227,7 @@ class ChangeProfileHandler(BaseHandler):
             if info.has_key('password'):
                 info['password'] = info_encrypt.encrypt(info['password'])
                 
-                self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+                self.collection.update({'email': self.email}, {'$set': info}, callback = self.func_response)
         
         else:
             if info_encrypt.match(result['password'], self.password):
