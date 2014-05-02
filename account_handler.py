@@ -21,7 +21,7 @@ class LoginHandler(BaseHandler):
             # self.write(message_json)
             # print 'connected succeed'
         
-            self.finish()
+            # self.finish()
             return
         
             # return a json file with a token(token is a hash string generated with email and log_in time)
@@ -63,6 +63,7 @@ class LoginHandler(BaseHandler):
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'connected succeed'
+            self.finish()
             
             collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
             collection.do_update({'email': result['email']}, insert_message, self.func_write, message, upsert=True)
