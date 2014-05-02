@@ -12,9 +12,7 @@ class LoginHandler(BaseHandler):
     """Response for request for login"""
     
     def func_write(sefl, result, info):
-        print 'write may begin'
-        print result
-        if reuslt:
+        if result:
             print 'write begin'
             message_json = json.dumps(info)
             self.set_header("Content_Type", "application/json")
