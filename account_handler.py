@@ -13,15 +13,15 @@ class LoginHandler(BaseHandler):
     
     def func_write(sefl, result, info):
         if result:
-            # print 'write begin'
-            # # print info
-            # message_json = json.dumps(info)
-            # # print message_json
-            # self.set_header("Content_Type", "application/json")
-            # self.write(message_json)
-            # print 'connected succeed'
+            print 'write begin'
+            # print info
+            message_json = json.dumps(info)
+            # print message_json
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'connected succeed'
         
-            # self.finish()
+            self.finish()
             return
         
             # return a json file with a token(token is a hash string generated with email and log_in time)
@@ -36,7 +36,8 @@ class LoginHandler(BaseHandler):
             self.finish()
             return
     
-    def func(self, result, info):
+    @tornado.web.asynchronous
+    def func_after_check_pass(self, result, info):
         if result and info_encrypt.match(result['password'], info['password']):
             print 'pass ok'
             user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
@@ -58,12 +59,6 @@ class LoginHandler(BaseHandler):
                     'time': str(datetime.now())
                 }
             }
-            
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            print 'connected succeed'
-            self.finish()
             
             collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
             collection.do_update({'email': result['email']}, insert_message, self.func_write, message, upsert=True)
@@ -91,7 +86,7 @@ class LoginHandler(BaseHandler):
         collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
         query = {tag: info}
         
-        collection.do_find_one(query, self.func, {'password': password})
+        collection.do_find_one(query, self.func_after_check_pass, {'password': password})
         
         
         
