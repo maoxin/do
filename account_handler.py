@@ -11,13 +11,13 @@ from log_info import log_info
 class LoginHandler(BaseHandler):
     """Response for request for login"""
     
-    def func_write(self, result, error):
+    def func_write(self, result, info):
         if result:
             print 'write begin'
             # print info
-            message_json = json.dumps(self.message)
-            # print message_json
+            message_json = json.dumps(info)
             print self.on_connection_close()
+            # print message_json
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'connected succeed'
@@ -43,7 +43,7 @@ class LoginHandler(BaseHandler):
             print 'pass ok'
             user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
             
-            self.message = {
+            message = {
                 "response": "ok", 
                 'email': result['email'], 
                 'phone': result['phone'], 
@@ -52,7 +52,7 @@ class LoginHandler(BaseHandler):
                 'user_key': user_key,
             }
             
-            change_message = {
+            insert_message = {
                 '$set':{
                     'name':  result['name'],
                     'user_id': user_id,
@@ -62,8 +62,7 @@ class LoginHandler(BaseHandler):
             }
             
             collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
-         
-            self.client.users.user_id_key.update({'email': result['email']}, change_message, upsert=True, callback=self.func_write)
+            collection.do_update({'email': result['email']}, insert_message, self.func_write, message, upsert=True)
             
             
         else:
