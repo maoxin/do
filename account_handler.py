@@ -2,24 +2,62 @@ import json
 import tornado.web
 import db_handler
 import info_encrypt
+import uuid
 from datetime import datetime
+from dateutil import parser
 from base_handler import BaseHandler
 from log_info import log_info
         
 class LoginHandler(BaseHandler):
     """Response for request for login"""
-    def func(self, result, info):
-        if result and info_encrypt.match(result['password'], info['password']):
-            message = {"response": "ok", 'email': result['email'], 'phone': result['phone'], 'name': result['name']}
-            message_json = json.dumps(message)
+    
+    def func_write(sefl, result, info):
+        if reuslt:
+            message_json = json.dumps(info)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'connected succeed'
-            
+        
             self.finish()
             return
-            
+        
             # return a json file with a token(token is a hash string generated with email and log_in time)
+            
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+            print 'connected fail'
+        
+            self.finish()
+            return
+    
+    def func(self, result, info):
+        if result and info_encrypt.match(result['password'], info['password']):
+            user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
+            
+            message = {
+                "response": "ok", 
+                'email': result['email'], 
+                'phone': result['phone'], 
+                'name': result['name'],
+                'user_id': user_id,
+                'user_key': user_key,
+            }
+            
+            insert_message = {
+                '$set':{
+                    'name':  result['name'],
+                    'user_id': user_id,
+                    'user_key': user_key,
+                    'time': str(datetime.now())
+                }
+            }
+            
+            collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
+            collection.do_update({'email': result['email']}, insert_message, self.func_write, message, upsert=True)
+            
             
         else:
             message = {"response": "fail"}
@@ -51,14 +89,29 @@ class LoginHandler(BaseHandler):
 class RegisterHandler(BaseHandler):
     """Response for request for regist"""
     def func(self, result, info):
-        if not result:        
-            message = {"response": "ok"}
+        if not result:
+            user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
+            insert_message = {
+                            'email': self.email,
+                            'name':  self.name,
+                            'user_id': user_id,
+                            'user_key': user_key,
+                            'time': str(datetime.now())
+            }
+            
+            message = {
+                "response": "ok",
+                "user_id": user_id,
+                "user_key": user_key,
+                
+            }
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
             print 'register succeed'
             
             self.client.users.contact_with_password.insert(info)
+            self.client.users.user_id_key.insert(insert_message)
         
         else:
             message = {"response": "fail"}
@@ -75,15 +128,15 @@ class RegisterHandler(BaseHandler):
         log_info('register', self.client)
         
         json_file = json.loads(self.get_argument('JSON_SIGN'))
-        name = json_file['name']
-        email = json_file['email']
+        self.name = json_file['name']
+        self.email = json_file['email']
         phone = json_file['phone']
         password = json_file['password']
         
         password = info_encrypt.encrypt(password)
         info = {
-            'name': name, 
-            'email': email, 
+            'name': self.name, 
+            'email': self.email, 
             'phone': phone, 
             'password': password,
             'picture_path': None,
@@ -235,7 +288,7 @@ class GetProfilePictureHandler(BaseHandler):
         
 class LookOwnProfileHandler(BaseHandler):
     def func(self, result, info):
-        if result and info_encrypt.match(result['password'], info['password']):
+        if result:
             message = {
                 "response": "ok",
                 'email': result['email'], 
@@ -263,20 +316,48 @@ class LookOwnProfileHandler(BaseHandler):
             return
         
     
+    def func_after_check_id(self, result, info):
+        if result:
+            old_time = parser.parse(result['time'])
+            later_time = date_time.now()
+            
+            delta = later_time - old_time
+            if (delta.days == 0 and delta.seconds < 3600):
+                query = info
+                collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
+                collection.do_find_one(query, self.func, {})
+                
+            else:
+                message = {"response": "id_key expired"}
+                message_json = json.dumps(message)
+                self.set_header("Content_Type", "application/json")
+                self.write(message_json)
+                print 'connected fail'
+            
+                self.finish()
+                return
+                
+    
     @tornado.web.asynchronous
     def post(self):
         log_info('look_own_profile', self.client)
         
         json_file = json.loads(self.get_argument('JSON_LOOK_MY_PROFILE'))
-        print json_file
         tag = json_file['tag']
         info = json_file['info']
-        password = json_file['password']
+        user_id = json_file['user_id']
+        user_key = json_file['user_key']
         
-        collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
-        query = {tag: info}
+        collection = db_handler.DBHandler(self.client, 'users', 'user_id_key')
+        query = {
+            'user_id': user_id,
+            'user_key': user_key,
+        }
+        query_2 = {
+            tag:info
+        }
         
-        collection.do_find_one(query, self.func, {'password': password})
+        collection.do_find_one(query, self.func_after_check_id, info)
         
 class LookOtherProfile(BaseHandler):
     def func(self, result, info):
