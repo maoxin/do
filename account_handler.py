@@ -268,7 +268,7 @@ class LookOwnProfileHandler(BaseHandler):
         log_info('look_own_profile', self.client)
         
         json_file = json.loads(self.get_argument('JSON_LOOK_MY_PROFILE'))
-        tag = josn_file['tag']
+        tag = json_file['tag']
         info = json_file['info']
         password = json_file['password']
         
