@@ -17,6 +17,7 @@ class BaseHandler(tornado.web.RequestHandler):
             'email': email,
         }
         
+        print query
         print "check begin"
         collection.do_find_one(query, self.check_id_key_timestamp, {})
         
