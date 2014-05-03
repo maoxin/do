@@ -325,7 +325,7 @@ class LookOwnProfileHandler(BaseHandler):
     def func_after_check_id(self, result, info):
         if result:
             old_time = parser.parse(result['time'])
-            later_time = date_time.now()
+            later_time = datetime.now()
             
             delta = later_time - old_time
             if (delta.days == 0 and delta.seconds < 3600):
