@@ -7,6 +7,7 @@ from datetime import datetime
 from dateutil import parser
 from base_handler import BaseHandler
 from log_info import log_info
+
         
 class LoginHandler(BaseHandler):
     """Response for request for login"""
@@ -209,7 +210,7 @@ class ChangeProfileHandler(BaseHandler):
     
     def func(self, result, info):
         
-        if result and info_encrypt.match(result['password'], self.password):
+        if result:
             if info.has_key('picture'):
                 pic_decode = base64.b64decode(picture)
                 pic_path = './user_photos/' + info['email'] + '.png'
@@ -224,34 +225,34 @@ class ChangeProfileHandler(BaseHandler):
                 self.collection.do_find_one(query, self.func_after_check_name, info)
             
             if info.has_key('password'):
-                info['password'] = info_encrypt.encrypt(info['password'])
+                if info_encrypt.match(result['password'], self.password):
+                    info['password'] = info_encrypt.encrypt(info['password']) 
+                    self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+            
+                else:
+                    message = {
+                        "change_password": "password wrong",
+                        "change_name":     "ok",
+                        "change_picture":  "ok",
+                        "change_describe": "ok",
+                    }
                 
-                self.collection.update({'email': self.email}, {'$set': info}, call_back = self.func_response)
+                    message_json = json.dumps(message)
+                    self.set_header("Content_Type", "application/json")
+                    self.write(message_json)
+            
+                    self.finish()
+                    return
+                    
         
         else:
-            if info_encrypt.match(result['password'], self.password):
-                message = {
-                    "change_password": "password wrong",
-                    "change_name":     "ok",
-                    "change_picture":  "ok",
-                    "change_describe": "ok",
-                }
-                
-                message_json = json.dumps(message)
-                self.set_header("Content_Type", "application/json")
-                self.write(message_json)
-            
-                self.finish()
-                return
-            
-            else:
-                message = {"response": "fail"}
-                message_json = json.dumps(message)
-                self.set_header("Content_Type", "application/json")
-                self.write(message_json)
-            
-                self.finish()
-                return       
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return       
     
     @tornado.web.asynchronous
     def post(self):
@@ -268,18 +269,15 @@ class ChangeProfileHandler(BaseHandler):
         if 'password' in changes:
             self.password = json_file['password']
         
-        info = {}
+        self.info = {}
         self.has_item = []
         for item in self.allow_item:
             if item in changes:
                 self.has_item.append(item)
-                info[item] = json_file['change_' + item]
+                self.info[item] = json_file['change_' + item]
         
         
-        self.collection = db_handler.DBHandler(self.client, 'users', 'contact_with_password')
-        query = {'email': self.email}
-        
-        self.collection.do_find_one(query, self.func, info)
+        self.user_id_key_identify(self.user_id, self.user_key, self.email, self.func)
         
        
 class GetProfilePictureHandler(BaseHandler):
