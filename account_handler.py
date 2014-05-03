@@ -261,8 +261,12 @@ class ChangeProfileHandler(BaseHandler):
         json_file = json.loads(self.get_argument('JSON_CHANGE_PROFILE'))
         
         self.email = json_file['tag']
-        self.password = json_file['password']
+        self.user_id = json_file['user_id']
+        self.user_key = json_file['user_key']
+        
         changes = json_file['changes']
+        if 'password' in changes:
+            self.password = json_file['password']
         
         info = {}
         self.has_item = []

@@ -140,7 +140,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
             
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
-                raise KeyError
+                raise
                 
         
         elif json_file.has_key('status') and json_file['status'] == 'report_position':
