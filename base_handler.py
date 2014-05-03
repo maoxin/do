@@ -17,6 +17,7 @@ class BaseHandler(tornado.web.RequestHandler):
             'email': email,
         }
         
+        print "check begin"
         collection.do_find_one(query, self.check_id_key_timestamp, {})
         
     def check_id_key_timestamp(self, result, info):
@@ -29,13 +30,14 @@ class BaseHandler(tornado.web.RequestHandler):
             
             delta = later_time - old_time
             if (delta.days == 0 and delta.seconds < 3600):
+                print "check finish"
                 func_after_check_id(result, {})
             else:
                 message = {"response": "id_key_expired"}
                 message_json = json.dumps(message)
                 self.set_header("Content_Type", "application/json")
                 self.write(message_json)
-                print 'connected fail'
+                print 'check fail'
         
                 self.finish()
                 return
@@ -45,7 +47,7 @@ class BaseHandler(tornado.web.RequestHandler):
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
             self.write(message_json)
-            print 'connected fail'
+            print 'check fail'
         
             self.finish()
             return
