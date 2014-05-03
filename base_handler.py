@@ -22,6 +22,7 @@ class BaseHandler(tornado.web.RequestHandler):
         
     def check_id_key_timestamp(self, result, info):
         if result:
+            print "find id_key"
         
             func_after_check_id = info
         
@@ -43,6 +44,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 return
         
         else:
+            print 'not_find'
             message = {"response": "fail"}
             message_json = json.dumps(message)
             self.set_header("Content_Type", "application/json")
