@@ -123,6 +123,8 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 self.email = email
                 self.item_id = item_id
                 
+                print 'map connect name:', self.name
+                
                 if MapWebSocket.attendees.has_key(self.item_id):
                     for item in MapWebSocket.attendees[self.item_id]:
                         if item == self.email:
