@@ -261,7 +261,7 @@ class ChangeProfileHandler(BaseHandler):
         self.allow_item = ['name', 'password', 'picture', 'describe']
         json_file = json.loads(self.get_argument('JSON_CHANGE_PROFILE'))
         
-        self.email = json_file['tag']
+        self.email = json_file['email']
         self.user_id = json_file['user_id']
         self.user_key = json_file['user_key']
         
