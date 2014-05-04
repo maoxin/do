@@ -147,7 +147,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                     'status': 'add_to_talk_list', 
                     'mission_id': self.item_id, 
                     'attendees': []}
-                for attendee in in MapWebSocket.attendees[self.item_id]:
+                for attendee in MapWebSocket.attendees[self.item_id]:
                     info['attendees'].append({
                         'time': self.time,
                         'name': self.name,
