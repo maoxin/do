@@ -19,7 +19,7 @@ class BaseHandler(tornado.web.RequestHandler):
         
         print query
         print "check begin"
-        collection.do_find_one(query, self.check_id_key_timestamp, {})
+        collection.do_find_one(query, self.check_id_key_timestamp, func_after_check_id)
         
     def check_id_key_timestamp(self, result, info):
         if result:
