@@ -118,10 +118,17 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 name = json_file['name']
                 email = json_file['email']
                 item_id = json_file['mission_id']
+                lat = json_file['lat']
+                lon = json_file['lon']
+                tm = json_file['time']
                 
                 self.name = name
                 self.email = email
                 self.item_id = item_id
+                
+                self.lat = lat
+                self.lon = lon
+                self.time = tm
                 
                 print 'map connect name:', self.name
                 
@@ -136,7 +143,19 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 else:
                     MapWebSocket.attendees[self.item_id] = {self.email: self}
                 
-                self.write_message( {'status': 'add_to_talk_list'} )
+                info = {
+                    'status': 'add_to_talk_list', 
+                    'mission_id': self.item_id, 
+                    'attendees': []}
+                for attendee in in MapWebSocket.attendees[self.item_id]:
+                    info['attendees'].append({
+                        'time': self.time,
+                        'name': self.name,
+                        'lat': self.lat,
+                        'lon': self.lon,
+                    })
+                
+                self.write_message(info)
             
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
@@ -163,7 +182,6 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                         'status': 'fresh_position',
                         'time': json_file['time'],
                         'mission_id': self.item_id,
-                        'email': self.email,
                         'name':  self.name,
                         'lat': lat,
                         'lon': lon,
