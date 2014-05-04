@@ -149,10 +149,10 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                     'attendees': []}
                 for attendee in MapWebSocket.attendees[self.item_id]:
                     info['attendees'].append({
-                        'time': tm,
-                        'name': self.name,
-                        'lat': self.lat,
-                        'lon': self.lon,
+                        'time': str(attendee.time),
+                        'name': attendee.name,
+                        'lat': attendee.lat,
+                        'lon': attendee.lon,
                     })
                 
                 self.write_message(info)
