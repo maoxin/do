@@ -128,7 +128,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 
                 self.lat = lat
                 self.lon = lon
-                self.time = tm
+                self.time = parser.parse(tm)
                 
                 print 'map connect name:', self.name
                 
@@ -149,7 +149,7 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                     'attendees': []}
                 for attendee in MapWebSocket.attendees[self.item_id]:
                     info['attendees'].append({
-                        'time': self.time,
+                        'time': tm,
                         'name': self.name,
                         'lat': self.lat,
                         'lon': self.lon,
