@@ -31,6 +31,7 @@ class BaseHandler(tornado.web.RequestHandler):
             later_time = datetime.now()
             
             delta = later_time - old_time
+            print delta
             if (delta.days == 0 and delta.seconds < 3600):
                 print "check finish"
                 func_after_check_id(result, {})
