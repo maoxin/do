@@ -157,7 +157,6 @@ class MapWebSocket(tornado.websocket.WebSocketHandler):
                 
                 self.write_message(info)
                 print 'map connect succeed'
-                self.finish()
             
             except KeyError:
                 self.write_message( {'status': 'error', 'detail': 'enter the right key'})
