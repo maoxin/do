@@ -35,6 +35,7 @@ application = tornado.web.Application([
     (r'/item/picture', item_handler.PostItemPicure),
     
     (r'/item/get_new_item', item_handler.GetNewItemHandler),
+    (r'/item/get_item_in_map', item_handler.GetItemInMapHandler),
     (r'/item/get_mission_picture', item_handler.GetMissionPictureHandler),
     
     (r'/item/receive', item_handler.RecieveItemHandler),
