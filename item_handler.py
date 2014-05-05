@@ -244,6 +244,8 @@ class GetItemInMapHandler(BaseHandler):
         message_json = json.dumps(self.response)
         self.set_header("Content_Type", "application/json")
         self.write(message_json)
+        
+        print 'item map succeed'
 
         self.finish()
         return
