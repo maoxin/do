@@ -27,11 +27,11 @@ class BaseHandler(tornado.web.RequestHandler):
         
             func_after_check_id = info
             
-            print "func loaded"
         
             old_time = parser.parse(result['time'])
             later_time = datetime.now()
             
+            print old_time, later_time
             delta = later_time - old_time
             print delta
             if (delta.days == 0 and delta.seconds < 3600):
