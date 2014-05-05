@@ -143,14 +143,15 @@ class PostItemPicure(BaseHandler):
         
 class GetNewItemHandler(BaseHandler):
     def func_delete_items(self, result, info):
+        self.response = {'response': self.items_info}
         if result:
             delete_ids = [str(x['delete_time_id']) for x in result]
-            self.items_info['delete'] = delete_ids
+            self.response['delete'] = delete_ids
         
         else:
             pass
          
-        message_json = json.dumps({'response': self.items_info})
+        message_json = json.dumps(self.response)
         self.set_header("Content_Type", "application/json")
         self.write(message_json)
 
@@ -230,6 +231,89 @@ class GetNewItemHandler(BaseHandler):
         collection = db_handler.DBHandler(self.client, 'resource', 'items')
         collection.do_find({}, self.func_new_item, info, direction=-1, axis="_id", limit=15)
         
+class GetItemInMapHandler(BaseHandler):
+    def func_delete_items(self, result, info):
+        self.response = {'items': self.items_info}
+        if result:
+            delete_ids = [str(x['delete_time_id']) for x in result]
+            self.response['delete'] = delete_ids
+        
+        else:
+            pass
+         
+        message_json = json.dumps(self.response)
+        self.set_header("Content_Type", "application/json")
+        self.write(message_json)
+
+        self.finish()
+        return
+    
+    def func_new_item(self, result, info):
+        if result:
+            latest_id = info
+            
+            items = filter(lambda x: x['_id'] > latest_id, result)
+            self.items_info = []
+            for item in items:
+                info = {
+                    'mission_id': str(item['_id']),
+                    'up_name': item['up_name'],
+        
+                    'mission_name': item['name'],
+
+                    'lat': item['lat'],
+                    'lon': item['lon'],
+                }
+                
+                self.items_info.append(info)
+            
+            query = {
+                '_id': {
+                    '$in': self.ids
+                }
+            }
+            
+            info = {}    
+            
+            collection = db_handler.DBHandler(self.client, 'resource', 'delete_items')
+            collection.do_find(query, self.func_delete_items, info, direction=-1, axis="_id", limit=9999)
+            
+        else:
+            message = {"response": "fail"}
+            message_json = json.dumps(message)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+        
+            self.finish()
+            return
+    
+    def func_after_identify(self, result, nothing_input_here):
+        if result:
+            if not self.ids or not self.ids[0]:
+                info = 0
+            else:
+                info = max(ids)
+            
+            collection = db_handler.DBHandler(self.client, 'resource', 'items')
+            collection.do_find({}, self.func_new_item, info, direction=-1, axis="_id", limit=9999)
+    
+    
+    @tornado.web.asynchronous
+    def post(self):
+        log_info('get_item_in_map', self.client)
+            
+        json_file = json.loads(self.get_argument('JSON_POINT_GET'))
+        self.name = json_file['name']
+        self.user_id = json_file['user_id']
+        self.user_key = json_file['user_key']
+
+        ids = list(np.unique(json_file['ids']))
+        print ids
+        ids = [ObjectId(x) for x in ids]
+        self.ids = ids
+        
+        self.user_id_key_identify('name', self.user_id, self.user_key, self.name, self.func_after_identify)
+    
         
 
 class GetMissionPictureHandler(BaseHandler):

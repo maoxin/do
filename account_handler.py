@@ -277,7 +277,7 @@ class ChangeProfileHandler(BaseHandler):
                 self.info[item] = json_file['change_' + item]
         
         
-        self.user_id_key_identify(self.user_id, self.user_key, self.email, self.func)
+        self.user_id_key_identify('email', self.user_id, self.user_key, self.email, self.func)
         
        
 class GetProfilePictureHandler(BaseHandler):
