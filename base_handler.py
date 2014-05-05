@@ -26,6 +26,8 @@ class BaseHandler(tornado.web.RequestHandler):
             print "find id_key"
         
             func_after_check_id = info
+            
+            print "func loaded"
         
             old_time = parser.parse(result['time'])
             later_time = datetime.now()
