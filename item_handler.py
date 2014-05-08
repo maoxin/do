@@ -592,7 +592,7 @@ class ItemTalkHandler(BaseHandler):
                 if talk_man:
                     talk_man.write_content_to_team_mate(content)
             except KeyError:
-                raise KeyError
+                raise 
             
             self.finish()
             return
