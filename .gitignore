@@ -7,3 +7,5 @@ log
 nohup.out
 结算
 *#
+
+supervisord*
