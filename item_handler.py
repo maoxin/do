@@ -702,4 +702,72 @@ class ItemGetTalkHandler(BaseHandler):
         collection.do_find_one(self.query_item, self.func_after_find_item, info)
         
         
+class GetItemDetailHandler(BaseHandler):
+    
+    def func_after_find_item(self, result, info):
+        if result:
+            item = result
+            info = {
+                'mission_id': str(item['_id']),
+                'mission_up_email': item['up_email'],
+                'mission_up_name': item['up_name'],
+
+                'mission_tag': item['tag'],     
+                'mission_name': item['name'],
+                'mission_description': item['description'],
+
+                'mission_place': item['place_name'],
+                'mission_place_latitude': item['lat'],
+                'mission_place_longitude': item['lon'],
+
+                'mission_begin_time': item['begin_time'],
+                'mission_continue': item['continue_time'],
+                'mission_accept_num': item['accept_num'],
+                
+                'user_info_geo_latitude': item['user_lat'],
+                'user_info_geo_longitude': item['user_lon'],
+
+                'attendee': item['attendee'],
+                'user_info_str': '',
+
+                'picture_path': item['picture_path'],
+                }
+            
+            message_json = json.dumps(info)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+
+            self.finish()
+            return
+        
+        else:
+            response = {
+                'response': 'mission not found'
+            }
+            
+            message_json = json.dumps(self.response)
+            self.set_header("Content_Type", "application/json")
+            self.write(message_json)
+
+            self.finish()
+            return
+                
+            
+        
+    
+    @tornado.web.asynchronous
+    def post(self):    
+        log_info('get_item_detail', self.client)
+            
+        json_file = json.loads(self.get_argument('JSON_GET_MISSION_MORE'))
+        item_id = json_file['mission_id']
+        
+        query = {
+            'item_id': ObjectId(item_id)
+        }
+        
+        info = {}
+        
+        collection = db_handler.DBHandler(self.client, 'resource', 'items')
+        collection.do_find_one(self.query_item, self.func_after_find_item, info)
         
