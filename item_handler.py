@@ -640,7 +640,7 @@ class GetItemDetailHandler(BaseHandler):
                 
                 'user_lat': item['user_lat'],
                 'user_lon': item['user_lon'],
-                'user_place_name': item['user_place_name']
+                'user_place_name': item['user_place_name'],
 
                 'mission_attendee': item['mission_attendee'],
 
