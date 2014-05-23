@@ -104,8 +104,8 @@ class GetPictureHandler(BaseHandler):
         log_info('get_profile_picture', self.client)
         
         json_file = json.loads(self.get_argument('JSON_PROFILE_PICTURE_GET'))
-        user_pic_path = json_file['user_pic_path']
-        print user_pic_path
+        pic_path = json_file['pic_path']
+        print pic_path
         
-        self.send_picture_to_client(user_pic_path)
+        self.send_picture_to_client(pic_path)
 # change_end

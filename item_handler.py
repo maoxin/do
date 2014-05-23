@@ -275,7 +275,7 @@ class GetItemInMapHandler(BaseHandler):
     def post(self):
         log_info('get_new_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_GET_NEW_ITEM'))
+        json_file = json.loads(self.get_argument('JSON_ITEM_IN_MAP'))
 
         ids = list(np.unique(json_file['ids']))
         print ids
@@ -435,7 +435,7 @@ class DeleteItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
         
-        email = json_file['email']
+        email = json_file['mission_up_email']
         user_id = json_file['user_id']
         user_key = json_file['user_key']
         
@@ -496,7 +496,7 @@ class ArchiveItemHandler(BaseHandler):
     def post(self):
         log_info('archive_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
+        json_file = json.loads(self.get_argument('JSON_ARCHIVE_ITEM'))
         
         email = json_file['email']
         user_id = json_file['user_id']
