@@ -11,212 +11,201 @@ from base_handler import BaseHandler
 from log_info import log_info
         
 class PostItemHandler(BaseHandler):
-    def func(self, result, error):
+    def response_to_client(self, item_id, error):
         if not error:
-            item_id = str(result)
-            message = {"response": item_id}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            print 'Item Create Succeed'
             
-            print item_id
-            self.finish()
-            return
+            item_id = str(item_id)
+            write_message = {"response": item_id}
+            
+            self.write_info_to_client(write_message)
             
         else:
             print error
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            write_message = {"response": error}
             
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
+    
+    def create_mission(self, user_info, nothing_to_read):
+        if user_info:
+            self.item_info.insert(self.mission_info, callback=self.response_to_client)
+        
+        else:
+            write_message = {"response": "id_key_not_matched"}
+            self.write_info_to_client(write_message)
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('post_item', self.client)
+        log_info('post_item', self.log_operation)
         
-        json_file = json.loads(self.get_argument('JSON_ITEM_CREATE'))
-        up_email = json_file['mission_up_email']
-        up_name = json_file['mission_up_name']
+        json_file = json.loads(self.get_argument('JSON_CREATE_ITEM'))
         
-        tag = json_file['mission_tag']
-        name = json_file['mission_name']
-        description = json_file['mission_description']
+        email = json_file['mission_up_email']
+        user_id = json_file['user_id']
+        user_key = json_file['user_key']
         
-        place_name = json_file['mission_place_name']
-        lat = json_file['mission_place_latitude']
-        lon = json_file['mission_place_longitude']
+        mission_up_email = json_file['mission_up_email']
+        mission_up_name = json_file['mission_up_name']
         
-        user_place_name = json_file['user_info_str']
-        user_lat = json_file['user_info_geo_latitude']
-        user_lon = json_file['user_info_geo_longitude']
+        mission_tag = json_file['mission_tag']
+        mission_name = json_file['mission_name']
+        mission_description = json_file['mission_description']
         
-        begin_time = json_file['mission_begin_time']
-        continue_time = json_file['mission_continue']
+        mission_place_name = json_file['mission_place_name']
+        mission_lat = json_file['mission_lat']
+        mission_lon = json_file['mission_lon']
         
-        accept_num = json_file['mission_accept_num']
+        user_place_name = json_file['user_place_name']
+        user_lat = json_file['user_lat']
+        user_lon = json_file['user_lon']
+        
+        mission_begin_time = json_file['mission_begin_time']
+        mission_continue = json_file['mission_continue']
+        
+        mission_accept_num = json_file['mission_accept_num']
 
         
-        info = {
-            'up_email': up_email,
-            'up_name': up_name,
+        self.mission_info = {
+            'mission_up_email': mission_up_email,
+            'mission_up_name': mission_up_name,
 
-            'tag': tag,
-            'name': name,
-            'description': description,
+            'mission_tag': mission_tag,
+            'mission_name': mission_name,
+            'mission_description': mission_description,
             
-            #
-            'place_name': place_name,
-            'lat': lat,
-            'lon': lon,
+            'mission_place_name': mission_place_name,
+            'mission_lat': mission_lat,
+            'mission_lon': misssion_lon,
             
-            #
             'user_place_name': user_place_name,
             'user_lat': user_lat,
             'user_lon': user_lon,
             
-            'begin_time': begin_time,
-            'continue_time': continue_time,
+            'mission_begin_time': mission_begin_time,
+            'mission_continue': mission_continue,           
             
-            'accept_num': int(accept_num),
+            'mission_accept_num': int(mission_accept_num),
             
-            #
-            'attendee': [],
+            'mission_attendee': [],
             # the uper himself maybe or not a member. need detail.
             
-            'create_time': str(datetime.now()),
-            
-            #
-            'picture_path': None,
+            'mission_pic_path': None,
         }
-
-        self.client.resource.items.insert(info, callback=self.func)
+        
+        self.user_id_key_identify(user_id, user_key, email, self.create_mission)
         
  
 class PostItemPicure(BaseHandler):
-    def func(self, result, error):
-        if not error:
-
-            message = {"response": 'ok'}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+    def response_to_client(self, update_result, nothing_to_read):
+        if update_result:
+            write_message = {"response": 'ok'}
             
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
             
         else:
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            write_message = {"response": 'fail'}
             
-            self.finish()
-            return
+            self.write_info_to_client(self.write_message)
    
     @tornado.web.asynchronous
     def post(self):
-        log_info('post_picture', self.client)
+        log_info('post_picture', self.log_operation)
         
-        json_file = json.loads(self.get_argument('JSON_IMAGE'))
-        name = json_file['mission_name']
-        up_email = json_file['mission_up_email']
-        picture = json_file['mission_picture']
+        json_file = json.loads(self.get_argument('JSON_POST_ITEM_PIC'))
         
-        pic_decode = base64.b64decode(picture)
+        mission_name = json_file['mission_name']
+        mission_up_email = json_file['mission_up_email']
+        mission_picture = json_file['mission_picture']
         
-        pic_path = './photo/' + up_email + '+' + name + '.png'
+        pic_decode = base64.b64decode(mission_picture)
+        
+        pic_path = './item_photo/' + mission_up_email + '+' + mission_name + '.png'
         with open(pic_path, 'wb') as pc:
             pc.write(pic_decode)
         
-        query = {
-            'name': name,
-            'up_email': up_email
+        query_for_insert_pic = {
+            'mission_name': mission_name,
+            'mission_up_email': mission_up_email
         }
         
-        print query
+        change = {
+            "$set": {'mission_pic_path': pic_path}
+        }
         
-        self.client.resource.items.update(query, {"$set": {'picture_path': pic_path} }, callback=self.func)
+        info_to_response_to_clinet = {}
+        
+        print query_for_insert_pic
+        
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_update(query_for_insert_pic, change, self.response_to_client, info_to_response_to_clinet)
         
         
 class GetNewItemHandler(BaseHandler):
-    def func_delete_items(self, result, info):
-        self.response = {'response': self.items_info}
-        if result:
-            delete_ids = [str(x['delete_time_id']) for x in result]
-            self.response['delete'] = delete_ids
+    def package_deleted_items_and_response_to_client(self, deleted_items, items_info):
+        write_message = {'response': items_info}
+        
+        if deleted_items:
+            deleted_ids = [str(x['deleted_item_id']) for x in deleted_items]
+            write_message['delete_ids'] = delete_ids
         
         else:
             pass
          
-        message_json = json.dumps(self.response)
-        self.set_header("Content_Type", "application/json")
-        self.write(message_json)
-
-        self.finish()
-        return
+        self.write_info_to_client(write_message)
         
     
     
-    def func_new_item(self, result, info):
-        if result:
-            latest_id = info
+    def package_new_items(self, items, latest_id):
+        if items:
+            new_items = filter(lambda x: x['_id'] > latest_id, items)
+            items_info = []
             
-            items = filter(lambda x: x['_id'] > latest_id, result)
-            self.items_info = []
-            for item in items:
+            for item in new_items:
                 info = {
-                    'id': str(item['_id']),
-                    'up_email': item['up_email'],
-                    'up_name': item['up_name'],
+                    'mission_id': str(item['_id']),
+                    'mission_up_email': item['mission_up_email'],
+                    'mission_up_name': item['mission_up_name'],
         
-                    'tag': item['tag'],     
-                    'name': item['name'],
-                    'description': item['description'],
+                    'mission_tag': item['mission_tag'],     
+                    'mission_name': item['mission_name'],
+                    'mission_description': item['mission_description'],
 
-                    'place_name': item['place_name'],
-                    'lat': item['lat'],
-                    'lon': item['lon'],
+                    'mission_place_name': item['mission_place_name'],
+                    'mission_lat': item['mission_lat'],
+                    'mission_lon': item['mission_lon'],
 
-                    'begin_time': item['begin_time'],
-                    'continue_time': item['continue_time'],
-                    'accept_num': item['accept_num'],
+                    'mission_begin_time': item['mission_begin_time'],
+                    'mission_continue': item['mission_continue'],
+                    'mission_accept_num': item['mission_accept_num'],
 
-                    'attendee': item['attendee'],
+                    'mission_attendee': item['mission_attendee'],
 
-                    'picture_path': item['picture_path'],
+                    'mission_pic_path': item['mission_pic_path'],
                 }
                 
-                self.items_info.append(info)
+                items_info.append(info)
             
-            query = {
+            query_for_delete_items = {
                 '_id': {
                     '$in': self.ids
                 }
             }
+               
             
-            info = {}    
-            
-            collection = db_handler.DBHandler(self.client, 'resource', 'delete_items')
-            collection.do_find(query, self.func_delete_items, info, direction=-1, axis="_id", limit=15)
+            collection = db_handler.DBHandler(self.deleted_item_info)
+            collection.do_find(query_for_delete_items, self.package_deleted_items_and_response_to_client, items_info, direction=-1, axis="_id", limit=15)
             
         else:
-            message = {"response": "fail"}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-        
-            self.finish()
-            return
+            write_message = {"response": "fail"}
+            
+            self.write_info_to_client(write_message)
     
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('get_new_item', self.client)
+        log_info('get_new_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_NEW_ITEM'))
+        json_file = json.loads(self.get_argument('JSON_GET_NEW_ITEM'))
 
         ids = list(np.unique(json_file['ids']))
         print ids
@@ -224,457 +213,386 @@ class GetNewItemHandler(BaseHandler):
         self.ids = ids
         
         if not ids or not ids[0]:
-            info = 0
+            latest_id = 0
         else:
-            info = max(ids)
+            latest_id = max(ids)
         
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        collection.do_find({}, self.func_new_item, info, direction=-1, axis="_id", limit=15)
+        query_for_find_new_operation = {}
+        
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find(query_for_find_new_operation, self.package_new_items, max_id, direction=-1, axis="_id", limit=15)
         
 class GetItemInMapHandler(BaseHandler):
-    def func_delete_items(self, result, info):
-        self.response = {'items': self.items_info}
-        if result:
-            delete_ids = [str(x['delete_time_id']) for x in result]
-            self.response['delete'] = delete_ids
+    def package_deleted_items_and_response_to_client(self, deleted_items, items_info):
+        write_message = {'response': items_info}
+        
+        if deleted_items:
+            deleted_ids = [str(x['deleted_item_id']) for x in deleted_items]
+            write_message['delete_ids'] = delete_ids
         
         else:
             pass
          
-        message_json = json.dumps(self.response)
-        self.set_header("Content_Type", "application/json")
-        self.write(message_json)
+        self.write_info_to_client(write_message)
         
-        print 'item map succeed'
-
-        self.finish()
-        return
     
-    def func_new_item(self, result, info):
-        if result:
-            latest_id = info
+    
+    def package_new_items(self, items, latest_id):
+        if items:
+            new_items = filter(lambda x: x['_id'] > latest_id, items)
+            items_info = []
             
-            items = filter(lambda x: x['_id'] > latest_id, result)
-            self.items_info = []
-            for item in items:
+            for item in new_items:
                 info = {
                     'mission_id': str(item['_id']),
-                    'up_name': item['up_name'],
+                    'mission_up_name': item['mission_up_name'],
         
-                    'mission_name': item['name'],
+                    'mission_name': item['mission_name'],
 
-                    'lat': item['lat'],
-                    'lon': item['lon'],
+                    'mission_lat': item['mission_lat'],
+                    'mission_lon': item['mission_lon'],
                 }
                 
-                self.items_info.append(info)
+                items_info.append(info)
             
-            query = {
+            query_for_delete_items = {
                 '_id': {
                     '$in': self.ids
                 }
             }
+               
             
-            info = {}    
-            
-            collection = db_handler.DBHandler(self.client, 'resource', 'delete_items')
-            collection.do_find(query, self.func_delete_items, info, direction=-1, axis="_id", limit=9999)
+            collection = db_handler.DBHandler(self.deleted_item_info)
+            collection.do_find(query_for_delete_items, self.package_deleted_items_and_response_to_client, items_info, direction=-1, axis="_id", limit=15)
             
         else:
-            message = {"response": "fail"}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-        
-            self.finish()
-            return
-    
-    def func_after_identify(self, result, nothing_input_here):
-        if result:
-            if not self.ids or not self.ids[0]:
-                info = 0
-            else:
-                info = max(ids)
+            write_message = {"response": "fail"}
             
-            collection = db_handler.DBHandler(self.client, 'resource', 'items')
-            collection.do_find({}, self.func_new_item, info, direction=-1, axis="_id", limit=9999)
+            self.write_info_to_client(write_message)
     
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('get_item_in_map', self.client)
+        log_info('get_new_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_POINT_GET'))
-        self.name = json_file['name']
-        self.user_id = json_file['user_id']
-        self.user_key = json_file['user_key']
+        json_file = json.loads(self.get_argument('JSON_GET_NEW_ITEM'))
 
         ids = list(np.unique(json_file['ids']))
         print ids
         ids = [ObjectId(x) for x in ids]
         self.ids = ids
         
-        self.user_id_key_identify('name', self.user_id, self.user_key, self.name, self.func_after_identify)
-    
+        if not ids or not ids[0]:
+            latest_id = 0
+        else:
+            latest_id = max(ids)
         
-
-class GetMissionPictureHandler(BaseHandler):
-    def post(self):
-        log_info('get_picture', self.client)
+        query_for_find_new_operation = {}
         
-        json_file = json.loads(self.get_argument('JSON_PICTURE_GET'))
-        name = json_file['picture_path']
-        print name
-
-        picture = open(name, 'r').read()
-        self.set_header("Content-Type", "image/png; charset=utf-8")
-        self.write(picture)
-        
-        return
-        
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find(query_for_find_new_operation, self.package_new_items, max_id, direction=-1, axis="_id", limit=15)
 
 class RecieveItemHandler(BaseHandler):
-    
-    def func_write(self, result, info):
-        if result:
+    def response_to_client(self, update_result, item):
+        if update_result:
+            item['mission_attendee'].append(self.join_email)
             item_info = {
                 'response': 'ok',
-                'attendee': result['attendee'],
+                'mission_attendee': item['mission_attendee'],
                 'id': str(result['_id'])
             }
         
-            message_json = json.dumps(item_info)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-        
-            self.finish()
-            return
+            write_message = item_info
+            
+            self.write_info_to_client(write_message)
             
         else:
-            print error
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            write_message = {"response": error}
             
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
     
-    def func_after_update(self, result, error):
-        if not error:
-            self.collection.do_find_one(self.query, self.func_write, {})
+    def check_user_not_exist_and_allow(self, item, nothing_to_read):
+        if item and (len(item['mission_attendee']) < int(item['mission_accept_num'])):
+            print len(item['mission_attendee']), item['mission_accept_num']
             
-        else:
-            print error
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            mission_attendee = item['mission_attendee']
             
-            self.finish()
-            return
-    
-    def func(self, result, info):
-        if result and (len(result['attendee']) < int(result['accept_num'])):
-            print len(result['attendee']), result['accept_num']
-            self.info = result
+            if self.join_email not in mission_attendee:
             
-            query = {
-                '_id': info['_id']
-            }
+                query_for_update = {
+                    '_id': self.mission_id
+                }
+                
+                change = {
+                    '$push': {'mission_attendee': self.join_email}
+                }
+                
+                info_to_following_func = item
+                
+                collection = db_handler.DBHandler(self.item_info)
+                collection.do_update(query_for_update, change, self.response_to_client, info_to_following_func)
             
-            self.client.resource.items.update(query, {'$push': {'attendee': info['join_email']}}, callback=self.func_after_update)
+            else:
+                write_message = {
+                    'response': 'user_already_join_the_item'
+                }
+                
+                self.write_info_to_client(write_message)
         
         else:
-            if not result:
-                message = {"response": "item not found"}
-                message_json = json.dumps(message)
-                self.set_header("Content_Type", "application/json")
-                self.write(message_json)
-            
-                self.finish()
-                return
+            if not item:
+                write_message = {"response": "item not found"}
            
-            elif len(result['attendee']) >= int(result['accept_num']):
-                message = {"response": "attendee full"}
-                message_json = json.dumps(message)
-                self.set_header("Content_Type", "application/json")
-                self.write(message_json)
-            
-                self.finish()
-                return
+            elif len(item['mission_attendee']) >= int(item['mission_accept_num']):
+                write_message = {"response": "attendee full"}
                 
             else:
-                message = {"response": "fail"}
-                message_json = json.dumps(message)
-                self.set_header("Content_Type", "application/json")
-                self.write(message_json)
+                write_message = {"response": "fail"}
+                
+            self.write_info_to_client(write_message)
             
-                self.finish()
-                return
+
+    def find_the_item(self, user_info, nothing_to_read):
+        if user_info:
+            query_for_find_the_item = {
+                '_id': self.mission_id,
+            }
+            
+            info_to_following_func = {}
+            
+            collection = db_handler.DBHandler(self.item_info)
+            collection.do_find_one(query_for_find_the_item, self.check_user_not_exist_and_allow, info_to_following_func)
 
     @tornado.web.asynchronous
     def post(self):
-        log_info('recieve_item', self.client)
+        log_info('recieve_item', self.log_operation)
             
+        email = json_file['join_email']
+        user_id = json_file['user_id']
+        user_key = json_file['user_key']
+        
         json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
-        item_id = json_file['mission_id']
-        join_email = json_file['join_email']
+        self.mission_id = ObjectId(json_file['mission_id'])
+        self.join_email = json_file['join_email']
 
-        self.query = {
-         '_id': ObjectId(item_id),
-        }
+        self.user_id_key_identify(user_id, user_key, email, self.find_the_item)
 
-        info = {'_id': self.query['_id'], 'join_email': join_email}
-
-        self.collection = db_handler.DBHandler(self.client, 'resource', 'items')
-
-        document = self.collection.do_find_one(self.query, self.func, info)     
+             
 
     
     
 class DeleteItemHandler(BaseHandler):
-    def func_write(self, result, error):
+    def response_to_client(self, remove_result, error):
         if not error:
+            write_message = {"response": 'ok', 'id': str(self.mission_id)}
 
-            message = {"response": 'ok', 'id': str(self.query['_id'])}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
             
         else:
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            write_message = {"response": error}
             
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
+           
             
         
-    def func_delete(self, result, error):
+    def delete_the_item(self, insert_result, error):
         if not error:
-            self.client.resource.items.remove(self.query, callback=self.func_write)
-        else:
-            message = {'response': error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            query_for_remove_item = {
+                '_id': self.mission_id,
+            }
             
-            self.finish()
-            return
+            self.item_info.remove(query_for_remove_item, callback=self.response_to_client)
+        else:
+            write_message = {'response': error}
+            self.write_info_to_client(write_message)
     
-    def func_insert(self, result, info):
-        if result:
-            result['delete_time_id'] = result['_id']
-            result.pop('_id')
+    def create_deleted_item(self, item, nothing_to_read):
+        if item:
+            item['delete_time_id'] = item['_id']
+            item.pop('_id')
             
-            self.client.resource.delete_items.insert(result, callback=self.func_delete)
+            self.deleted_item_info.insert(item, callback=self.delete_the_item)
         
         else:
-            message = {'response': 'fail'}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            
-            self.finish()
-            return
+            write_message = {'response': 'fail'}
+            self.write_info_to_client(write_message)
         
+    def find_the_item(self, user_info, nothing_to_read):
+        
+        query_for_find_the_item = {
+            '_id': self.mission_id,
+            'mission_up_email': self.mission_up_email,
+        }
+        
+        info_to_following_func = {}
+        
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find_one(query_for_find_the_item, self.create_deleted_item, info_to_following_func)
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('delete_item', self.client)
+        log_info('delete_item', self.log_operation)
             
         json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
-        item_id = json_file['mission_id']
-        up_email = json_file['mission_up_email']
         
-        self.query = {
-            '_id': ObjectId(item_id),
-            'up_email': up_email,
-        }
+        email = json_file['email']
+        user_id = json_file['user_id']
+        user_key = json_file['user_key']
         
-        info = {}
+        self.mission_id = ObjectId(json_file['mission_id'])
+        self.mission_up_email = json_file['mission_up_email']
         
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        document = collection.do_find_one(self.query, self.func_insert, info)
-
+        self.user_id_key_identify(user_id, user_key, email, self.find_the_item)
 
 class ArchiveItemHandler(BaseHandler):
-    def func_write(self, result, error):
+    def response_to_client(self, remove_result, error):
         if not error:
+            write_message = {"response": 'ok', 'id': str(self.mission_id)}
 
-            message = {"response": 'ok', 'id': str(self.query['_id'])}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
             
         else:
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            write_message = {"response": error}
             
-            self.finish()
-            return
+            self.write_info_to_client(write_message)
+           
             
         
-    def func_delete(self, result, error):
+    def archive_the_item(self, insert_result, error):
         if not error:
-            self.client.resource.items.remove(self.query, callback=self.func_write)
-        else:
-            message = {'response': error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            query_for_remove_item = {
+                '_id': self.mission_id,
+            }
             
-            self.finish()
-            return
+            self.item_info.remove(query_for_remove_item, callback=self.response_to_client)
+        else:
+            write_message = {'response': error}
+            self.write_info_to_client(write_message)
     
-    def func_insert(self, result, info):
-        if result:
-            result['archive_time_id'] = result['_id']
-            result.pop('_id')
+    def create_archived_item(self, item, nothing_to_read):
+        if item:
+            item['delete_time_id'] = item['_id']
+            item.pop('_id')
             
-            self.client.resource.archive_items.insert(result, callback=self.func_delete)
+            self.archiveded_item_info.insert(item, callback=self.archive_the_item)
         
         else:
-            message = {'response': 'fail'}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            
-            self.finish()
-            return
+            write_message = {'response': 'fail'}
+            self.write_info_to_client(write_message)
         
+    def find_the_item(self, user_info, nothing_to_read):
+        
+        query_for_find_the_item = {
+            '_id': self.mission_id,
+            'mission_up_email': self.mission_up_email,
+        }
+        
+        info_to_following_func = {}
+        
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find_one(query_for_find_the_item, self.create_archived_item, info_to_following_func)
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('archive_item', self.client)
+        log_info('archive_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_ARCHIVE_ITEM'))
-        item_id = json_file['mission_id']
-        up_email = json_file['mission_up_email']
+        json_file = json.loads(self.get_argument('JSON_DELETE_ITEM'))
         
-        self.query = {
-            '_id': ObjectId(item_id),
-            'up_email': up_email,
-        }
+        email = json_file['email']
+        user_id = json_file['user_id']
+        user_key = json_file['user_key']
         
-        info = {}
+        self.mission_id = ObjectId(json_file['mission_id'])
+        self.mission_up_email = json_file['mission_up_email']
         
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        document = collection.do_find_one(self.query, self.func_insert, info)
+        self.user_id_key_identify(user_id, user_key, email, self.find_the_item)
 
 class ItemTalkHandler(BaseHandler):
-    def after_insert_func(self, result, error):
+    def send_talk(self, insert_result, error):
         if not error:
-            item_id = str(self.info['item_id'])
-            email = self.info['talking_email']
-            name = self.info['talking_name']
-            content = self.info['talking_content']
-
-            message = {"response": 'ok'}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
+            mission_id = str(self.info['mission_id'])
+            talking_email = self.info['talking_email']
+            talking_name = self.info['talking_name']
+            talking_content = self.info['talking_content']
             
             try:
                 print 'try send to every one'
-                talk_man = TalkWebSocket.attendees[item_id][email]
+                talk_man = TalkWebSocket.attendees[mission_id][talking_email]
 
                 if talk_man:
-                    talk_man.write_content_to_team_mate(content)
+                    talk_man.write_content_to_team_mate(talking_content)
+
             except KeyError:
                 raise 
             
-            self.finish()
-            return
+            write_message = {"response": 'ok'}
+            self.write_content_to_team_mate(write_message)
             
         else:
-            message = {"response": error}
-            message_json = json.dumps(message)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-            
-            self.finish()
-            return
-    
+            write_message = {"response": error}
+            self.write_content_to_team_mate(write_message)
+           
     @tornado.web.asynchronous
     def post(self):
-        log_info('talk_in_item', self.client)
+        log_info('talk_in_item', self.log_operation)
             
-        json_file = json.loads(self.get_argument('JSON_ITEM_TALK'))
-        item_id = json_file['mission_id']
+        json_file = json.loads(self.get_argument('JSON_TALK_ITEM'))
+        mission_id = ObjectId(json_file['mission_id'])
         talking_email = json_file['talking_email']
         talking_name = json_file['talking_name']
         talking_content = json_file['talking_content']
         
         self.info = {
-            'item_id': ObjectId(item_id),
+            'mission_id': mission_id,
             'talking_email': talking_email,
             'talking_name':  talking_name,
             'talking_content': talking_content
         }
         
-        self.client.resource.talks.insert(self.info, callback=self.after_insert_func)
+        self.talk_info.insert(self.info, callback=self.send_talk)
         
 class ItemGetTalkHandler(BaseHandler):
-    def func_after_find_talks(self, result, info):
-        if result:
-            latest_id = info
-        
-            talks = filter(lambda x: x['_id'] > latest_id, result)
-            self.items_info = []
+    def response_to_client(self, talks, info):
+        if talks:
+            talks = filter(lambda x: x['_id'] > self.latest_id, talks)
+            talks_info = []
             
             for talk in talks:
-                self.items_info.append(
+                talks_info.append(
                     {
                         'talking_id': str(talk['_id']),
-                        'mission_id': str(talk['item_id']),
+                        'mission_id': str(talk['mission_id']),
                         'talking_email': talk['talking_email'],
                         'talking_name':  talk['talking_name'],
                         'talking_content': talk['talking_content'],
                     }
                 )
             
-            message_json = json.dumps({'response': self.items_info})
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-
-            self.finish()
-            return
+            write_message = {'response': self.items_info}
+            self.write_info_to_client(write_message)
         
         else:
-            message_json = json.dumps({'response': 'fail'})    
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-
-            self.finish()
-            return
+            write_message = {'response': 'fail'}
+            self.write_info_to_client(write_message)
             
     
-    def func_after_find_item(self, result, info):
-        if result:
-            query = self.query_talk
-            info = info
+    def find_talk_place(self, item, nothing_to_read):
+        if item:
+            query_for_get_talk = {
+                'mission_id': self.mission_id,
+            }
             
-            collection = db_handler.DBHandler(self.client, 'resource', 'talks')
-            collection.do_find(query, self.func_after_find_talks, info, direction=-1, axis="_id", limit=10)
+            info_to_following_func = {}
+            collection = db_handler.DBHandler(self.talk_info)
+            collection.do_find(query, self.response_to_client, info_to_following_func, direction=-1, axis="_id", limit=10)
     
     
     @tornado.web.asynchronous
     def post(self):
-        log_info('get_talks_in_item', self.client)
+        log_info('get_talks_in_item', self.log_operation)
             
         json_file = json.loads(self.get_argument('JSON_ITEM_GET_TALK'))
-        item_id = json_file['mission_id']
+        self.mission_id = ObjectId(json_file['mission_id'])
         join_email = json_file['join_email']
         talk_ids = list(np.unique(json_file['talk_ids']))
         
@@ -682,92 +600,76 @@ class ItemGetTalkHandler(BaseHandler):
         self.talk_ids = talk_ids
         
         if not talk_ids or not talk_ids[0]:
-            info = 0
+            self.latest_id = 0
         else:
-            info = max(talk_ids)
+            self.latest_id = max(talk_ids)
             
-        self.query_item = {
-            '_id': ObjectId(item_id),
+        query_for_find_the_item = {
+            '_id': self.mission_id,
             'attendee': {
                 '$in': [join_email],
             }
         }
         
-        self.query_talk = {
-            'item_id': ObjectId(item_id),
-        }
+        info_to_following_func = {}
         
-        
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        collection.do_find_one(self.query_item, self.func_after_find_item, info)
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find_one(self.query_item, self.find_talk_place, info_to_following_func)
         
         
 class GetItemDetailHandler(BaseHandler):
     
-    def func_after_find_item(self, result, info):
+    def func_after_find_item(self, item, nothing_to_read):
         if result:
-            item = result
             info = {
                 'mission_id': str(item['_id']),
-                'mission_up_email': item['up_email'],
-                'mission_up_name': item['up_name'],
+                'mission_up_email': item['mission_up_email'],
+                'mission_up_name': item['mission_up_name'],
 
-                'mission_tag': item['tag'],     
-                'mission_name': item['name'],
-                'mission_description': item['description'],
+                'mission_tag': item['mission_tag'],     
+                'mission_name': item['mission_name'],
+                'mission_description': item['mission_description'],
 
-                'mission_place': item['place_name'],
-                'mission_place_latitude': item['lat'],
-                'mission_place_longitude': item['lon'],
+                'mission_place': item['mission_place_name'],
+                'mission_lat': item['mission_lat'],
+                'mission_lon': item['mission_lon'],
 
-                'mission_begin_time': item['begin_time'],
-                'mission_continue': item['continue_time'],
-                'mission_accept_num': item['accept_num'],
+                'mission_begin_time': item['mission_begin_time'],
+                'mission_continue': item['mission_continue'],
+                'mission_accept_num': item['mission_accept_num'],
                 
-                'user_info_geo_latitude': item['user_lat'],
-                'user_info_geo_longitude': item['user_lon'],
+                'user_lat': item['user_lat'],
+                'user_lon': item['user_lon'],
+                'user_place_name': item['user_place_name']
 
-                'attendee': item['attendee'],
-                'user_info_str': '',
+                'mission_attendee': item['mission_attendee'],
 
-                'picture_path': item['picture_path'],
+                'mission_pic_path': item['mission_pic_path'],
                 }
             
-            message_json = json.dumps(info)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-
-            self.finish()
-            return
+            write_message = info
+            self.write_info_to_client(write_message)
         
         else:
-            response = {
+            write_message = {
                 'response': 'mission not found'
             }
             
-            message_json = json.dumps(self.response)
-            self.set_header("Content_Type", "application/json")
-            self.write(message_json)
-
-            self.finish()
-            return
-                
-            
-        
+            self.write_info_to_client(write_message)   
     
     @tornado.web.asynchronous
     def post(self):    
-        log_info('get_item_detail', self.client)
+        log_info('get_item_detail', self.log_operation)
             
         json_file = json.loads(self.get_argument('JSON_GET_MISSION_MORE'))
-        item_id = json_file['mission_id']
+        mission_id = ObjectId(json_file['mission_id'])
         
-        query = {
-            'item_id': ObjectId(item_id)
+        query_for_find_mission = {
+            'mission_id': mission_id,
         }
         
-        info = {}
+        info_to_following_func = {}
         
-        collection = db_handler.DBHandler(self.client, 'resource', 'items')
-        collection.do_find_one(self.query_item, self.func_after_find_item, info)
+        collection = db_handler.DBHandler(self.item_info)
+        collection.do_find_one(query_for_find_mission, self.response_to_client, info_to_following_func)
         

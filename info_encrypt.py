@@ -1,12 +1,12 @@
 from passlib.hash import bcrypt
 
-def encrypt(password):
-    encrypted_password = bcrypt.encrypt(password)
+def encrypt(meta_info):
+    encrypted_info = bcrypt.encrypt(meta_info)
     
-    return encrypted_password
+    return encrypted_info
     
-def match(true_password, offer_password):
-    if bcrypt.verify(offer_password, true_password):
+def match(true_info, offer_info):
+    if bcrypt.verify(offer_info, true_info):
         return True
         
     else:

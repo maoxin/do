@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def log_info(operation_name, client):
+def log_info(operation_name, log_client):
     tm = datetime.now()
     info = {
         'operation_name': operation_name,
@@ -9,4 +9,4 @@ def log_info(operation_name, client):
     }
     
     print 'operation: ' + operation_name + ' time: ' + str(tm)
-    client.server_log.operation_log.insert(info)
+    log_client.insert(info)

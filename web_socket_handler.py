@@ -13,7 +13,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
     attendees = {}
     
     def open(self):
-        log_info('talk_web_socket_connected', client)
+        log_info('talk_web_socket_connected', client.server_log.operation_log)
         
         self.write_message({'status': "connected"})
     
@@ -23,37 +23,37 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
             'status': 'get_talk',
             'talk_name': self.name,
             'talk_content': content,
-            'item_id': self.item_id,
+            'mission_id': self.mission_id,
         }
 
-        for attendee in TalkWebSocket.attendees[self.item_id]:
-            TalkWebSocket.attendees[self.item_id][attendee].write_message(info)
+        for attendee in TalkWebSocket.attendees[self.mission_id]:
+            TalkWebSocket.attendees[self.mission_id][attendee].write_message(info)
 
         
     def on_message(self, message):
         json_file = json.loads(message)
         
         if json_file.has_key('status') and json_file['status'] == 'log_in':
-            log_info('talk_web_socket_logged', client)
+            log_info('talk_web_socket_logged', client.server_log.operation_log)
             try:
                 name = json_file['name']
                 email = json_file['email']
-                item_id = json_file['mission_id']
+                mission_id = json_file['mission_id']
                 
                 self.name = name
                 self.email = email
-                self.item_id = item_id
+                self.mission_id = mission_id
                 
-                if TalkWebSocket.attendees.has_key(self.item_id):
-                    for item in TalkWebSocket.attendees[self.item_id]:
+                if TalkWebSocket.attendees.has_key(self.mission_id):
+                    for item in TalkWebSocket.attendees[self.mission_id]:
                         if item == self.email:
                             self.write_message( {'status': 'already exist'} )
                             break
                     else:
-                        TalkWebSocket.attendees[self.item_id][self.email] = self
+                        TalkWebSocket.attendees[self.mission_id][self.email] = self
                 
                 else:
-                    TalkWebSocket.attendees[self.item_id] = {self.email: self}
+                    TalkWebSocket.attendees[self.mission_id] = {self.email: self}
         
                 self.write_message( {'status': 'add_to_talk_list'} )
             
@@ -73,7 +73,7 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
                     'talk_content': content,
                 }
             
-                for attendee in TalkWebSocket.attendees[self.item_id]:
+                for attendee in TalkWebSocket.attendees[self.mission_id]:
                     TalkWebSocket.attendees[self.email][attendee].write_message(info)
                     
             except KeyError:
@@ -87,12 +87,12 @@ class TalkWebSocket(tornado.websocket.WebSocketHandler):
     def on_close(self):
         log_info('talk_web_socket_disconnected', client)
         try:
-            TalkWebSocket.attendees[self.item_id].pop(self.email)
-            if not TalkWebSocket.attendees[self.item_id]:
-                TalkWebSocket.attendees.pop(self.item_id)   
+            TalkWebSocket.attendees[self.mission_id].pop(self.email)
+            if not TalkWebSocket.attendees[self.mission_id]:
+                TalkWebSocket.attendees.pop(self.mission_id)   
         except KeyError:
-            if TalkWebSocket.attendees.has_key(self.item_id):
-                print 'Already logged out, remain:', TalkWebSocket.attendees[self.item_id]
+            if TalkWebSocket.attendees.has_key(self.mission_id):
+                print 'Already logged out, remain:', TalkWebSocket.attendees[self.mission_id]
             else:
                 print 'Already logged out and delete the key-value'
         except AttributeError:

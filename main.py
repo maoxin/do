@@ -3,6 +3,7 @@ import motor
 import pymongo
 import tornado.web
 import tornado.ioloop
+import base_handler
 import account_handler
 import item_handler
 import relation_handler
@@ -13,7 +14,7 @@ client = motor.MotorClient()
 
 settings = {
     'degbug': True,
-    'autoreload': True,
+    # 'autoreload': True,
     'client': client,
     # 'cookie_secret': 'a secret cookie should not be told.',
     # we can use something more secret stored in db.
@@ -28,22 +29,22 @@ application = tornado.web.Application([
     (r'/register', account_handler.RegisterHandler),
     (r'/look_my_profile', account_handler.LookOwnProfileHandler),
     (r'/look_profile', account_handler.LookOtherProfile),
-    (r'/change_profile', account_handler.ChangeProfileHandler),
-    (r'/get_profile_picture', account_handler.GetProfilePictureHandler),
+    # (r'/change_profile', account_handler.ChangeProfileHandler),
+    
+    (r'/get_picture', base_handler.GetPictureHandler),
     
     (r'/item/post_item', item_handler.PostItemHandler),
     (r'/item/picture', item_handler.PostItemPicure),
     
     (r'/item/get_new_item', item_handler.GetNewItemHandler),
     (r'/item/get_item_in_map', item_handler.GetItemInMapHandler),
-    (r'/item/get_mission_picture', item_handler.GetMissionPictureHandler),
     
     (r'/item/receive', item_handler.RecieveItemHandler),
     (r'/item/delete', item_handler.DeleteItemHandler),
     (r'/item/archive', item_handler.ArchiveItemHandler),
     (r'/item/detail', item_handler.GetItemDetailHandler),
     
-    (r'/relation/follow', relation_handler.FollowHandler),
+    # (r'/relation/follow', relation_handler.FollowHandler),
     # post the latest items stored in mobile and get the new one.
     
     (r'/item/talk_in_item', item_handler.ItemTalkHandler),
