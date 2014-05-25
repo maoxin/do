@@ -10,15 +10,15 @@ class BaseHandler(tornado.web.RequestHandler):
 # change_begin
     def prepare(self):
         self.client = self.settings['client']
-        self.user_info = self.client.users.user_info_with_contact
+        self.user_info = self.settings['client'].users.user_info_with_contact
         
-        self.item_info = self.client.resource.items
-        self.deleted_item_info = self.client.resource.deleted_items
-        self.archived_item_info = self.client.resource.archived_items
+        self.item_info = self.settings['client'].resource.items
+        self.deleted_item_info = self.settings['client'].resource.deleted_items
+        self.archived_item_info = self.settings['client'].resource.archived_items
         
-        self.talk_info = self.cilent.resource.talks
+        self.talk_info = self.settings['client'].resource.talks
         
-        self.log_operation = self.client.server_log.operation_log
+        self.log_operation = self.settings['client'].server_log.operation_log
     
     def write_info_to_client(self, dic_message):
         message_json = json.dumps(dic_message)
