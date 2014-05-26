@@ -14,7 +14,7 @@ client = motor.MotorClient()
 
 settings = {
     'degbug': True,
-    # 'autoreload': True,
+    'autoreload': True,
     'client': client,
     # 'cookie_secret': 'a secret cookie should not be told.',
     # we can use something more secret stored in db.

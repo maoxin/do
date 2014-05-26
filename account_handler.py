@@ -43,7 +43,7 @@ class LoginHandler(BaseHandler):
             update_message = {
                 '$set':{
                     'user_id': user_id,
-                    'user_key': user_key,
+                    'user_key': info_encrypt.encrypt(user_key),
                     'id_key_time': str(datetime.now())
                 }
             }
@@ -85,7 +85,7 @@ class RegisterHandler(BaseHandler):
         if not recure_result:
             user_id, user_key = str(uuid.uuid4()), str(uuid.uuid4())
             account_info['user_id'] = user_id
-            account_info['user_key'] = user_key
+            account_info['user_key'] = info_encrypt.encrypt(user_key)
             account_info['id_key_time'] = str(datetime.now())
             
             write_message = {
@@ -119,7 +119,7 @@ class RegisterHandler(BaseHandler):
             'phone_number': phone_number, 
             'password': password,
             
-            'user_picture_path': None,
+            'user_pic_path': None,
             'user_description': None,
         }
         
@@ -255,7 +255,7 @@ class LookOwnProfileHandler(BaseHandler):
     def send_profile_to_client(self, user_info, nothing_to_read):
         if user_info:
             print 'look own success'
-            
+            print user_info
             write_message = {
                 "response": "ok",
                 'email': user_info['email'], 

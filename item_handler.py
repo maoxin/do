@@ -75,7 +75,7 @@ class PostItemHandler(BaseHandler):
             
             'mission_place_name': mission_place_name,
             'mission_lat': mission_lat,
-            'mission_lon': misssion_lon,
+            'mission_lon': mission_lon,
             
             'user_place_name': user_place_name,
             'user_lat': user_lat,
@@ -220,7 +220,7 @@ class GetNewItemHandler(BaseHandler):
         query_for_find_new_operation = {}
         
         collection = db_handler.DBHandler(self.item_info)
-        collection.do_find(query_for_find_new_operation, self.package_new_items, max_id, direction=-1, axis="_id", limit=15)
+        collection.do_find(query_for_find_new_operation, self.package_new_items, latest_id, direction=-1, axis="_id", limit=15)
         
 class GetItemInMapHandler(BaseHandler):
     def package_deleted_items_and_response_to_client(self, deleted_items, items_info):
@@ -290,19 +290,21 @@ class GetItemInMapHandler(BaseHandler):
         query_for_find_new_operation = {}
         
         collection = db_handler.DBHandler(self.item_info)
-        collection.do_find(query_for_find_new_operation, self.package_new_items, max_id, direction=-1, axis="_id", limit=15)
+        collection.do_find(query_for_find_new_operation, self.package_new_items, latest_id, direction=-1, axis="_id", limit=15)
 
 class RecieveItemHandler(BaseHandler):
     def response_to_client(self, update_result, item):
         if update_result:
+            
             item['mission_attendee'].append(self.join_email)
             item_info = {
                 'response': 'ok',
                 'mission_attendee': item['mission_attendee'],
-                'id': str(result['_id'])
+                'id': str(item['_id'])
             }
         
             write_message = item_info
+            
             
             self.write_info_to_client(write_message)
             
@@ -366,12 +368,13 @@ class RecieveItemHandler(BaseHandler):
     @tornado.web.asynchronous
     def post(self):
         log_info('recieve_item', self.log_operation)
+        
+        json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
             
         email = json_file['join_email']
         user_id = json_file['user_id']
         user_key = json_file['user_key']
         
-        json_file = json.loads(self.get_argument('JSON_RECEIVE_ITEM'))
         self.mission_id = ObjectId(json_file['mission_id'])
         self.join_email = json_file['join_email']
 
@@ -474,14 +477,13 @@ class ArchiveItemHandler(BaseHandler):
             item['delete_time_id'] = item['_id']
             item.pop('_id')
             
-            self.archiveded_item_info.insert(item, callback=self.archive_the_item)
+            self.archived_item_info.insert(item, callback=self.archive_the_item)
         
         else:
             write_message = {'response': 'fail'}
             self.write_info_to_client(write_message)
         
     def find_the_item(self, user_info, nothing_to_read):
-        
         query_for_find_the_item = {
             '_id': self.mission_id,
             'mission_up_email': self.mission_up_email,
@@ -498,7 +500,7 @@ class ArchiveItemHandler(BaseHandler):
             
         json_file = json.loads(self.get_argument('JSON_ARCHIVE_ITEM'))
         
-        email = json_file['email']
+        email = json_file['mission_up_email']
         user_id = json_file['user_id']
         user_key = json_file['user_key']
         
@@ -619,8 +621,8 @@ class ItemGetTalkHandler(BaseHandler):
         
 class GetItemDetailHandler(BaseHandler):
     
-    def func_after_find_item(self, item, nothing_to_read):
-        if result:
+    def response_to_client(self, item, nothing_to_read):
+        if item:
             info = {
                 'mission_id': str(item['_id']),
                 'mission_up_email': item['mission_up_email'],
@@ -665,8 +667,10 @@ class GetItemDetailHandler(BaseHandler):
         mission_id = ObjectId(json_file['mission_id'])
         
         query_for_find_mission = {
-            'mission_id': mission_id,
+            '_id': mission_id,
         }
+        
+        print query_for_find_mission
         
         info_to_following_func = {}
         

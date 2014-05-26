@@ -2,6 +2,7 @@ import motor
 import tornado.web
 import db_handler
 import info_encrypt
+import json
 from dateutil import parser
 from datetime import datetime
 
@@ -23,6 +24,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def write_info_to_client(self, dic_message):
         message_json = json.dumps(dic_message)
         self.set_header("Content_Type", "application/json")
+        print message_json
         self.write(message_json)
         
         print 'write_succeed'
@@ -57,11 +59,12 @@ class BaseHandler(tornado.web.RequestHandler):
         if result:
             print "find user_id"
         
-            user_key = info_to_check_id_key_timestamp['user_key']
-            func_after_check_id = info_to_check_id_key_timestamp['func_after_check_id']
+            user_key = user_key_and_following_function['user_key']
+            func_after_check_id = user_key_and_following_function['func_after_check_id']
         
             # check the key
             is_key_right = info_encrypt.match(result['user_key'], user_key)
+            
             
             if is_key_right:
                 old_time = parser.parse(result['id_key_time'])
@@ -83,7 +86,7 @@ class BaseHandler(tornado.web.RequestHandler):
                     self.user_info.update(fresh_time_query, fresh_change)
                     
                     print "check finish"
-                    func_after_check_id(result, info_to_following_function = {})
+                    func_after_check_id(result, nothing_to_read={})
                     # result is the user_info
                     
                 else:
