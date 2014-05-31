@@ -5,6 +5,7 @@ import info_encrypt
 import json
 from dateutil import parser
 from datetime import datetime
+from log_info import log_info
 
 class BaseHandler(tornado.web.RequestHandler):
     
